@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 210 50% 20%;
+    --card: 0 0% 100%;
+    --card-foreground: 210 50% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 210 50% 20%;
+    --primary: 200 100% 39%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 30 100% 50%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 40%;
+    --accent: 195 75% 61%;
+    --accent-foreground: 210 50% 20%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 200 50% 90%;
+    --input: 200 50% 90%;
+    --ring: 200 100% 39%;
+    --radius: 0.625rem;
+    
+    /* iWhistle Brand Colors */
+    --iwhistle-blue: #0080C8;
+    --iwhistle-orange: #FF8C00;
+    --iwhistle-deep: #003D7A;
+    --iwhistle-light: #4DB8E8;
+    --iwhistle-burnt: #E67300;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+}
+
+@layer components {
+  .gradient-primary {
+    background: linear-gradient(90deg, var(--iwhistle-blue) 0%, var(--iwhistle-orange) 100%);
+  }
+  
+  .gradient-evolution {
+    background: linear-gradient(90deg, var(--iwhistle-deep) 0%, var(--iwhistle-blue) 33%, var(--iwhistle-light) 66%, var(--iwhistle-orange) 100%);
+  }
+  
+  .text-gradient {
+    background: linear-gradient(90deg, var(--iwhistle-blue) 0%, var(--iwhistle-orange) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .btn-primary {
+    @apply px-6 py-3 rounded-lg text-white font-semibold transition-all duration-200;
+    background: linear-gradient(90deg, var(--iwhistle-blue) 0%, var(--iwhistle-orange) 100%);
+    background-size: 200% 100%;
+  }
+  
+  .btn-primary:hover {
+    background-position: 100% 0;
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 128, 200, 0.3);
+  }
+  
+  .btn-secondary {
+    @apply px-6 py-3 rounded-lg font-semibold transition-all duration-200 border-2;
+    border-color: var(--iwhistle-deep);
+    color: var(--iwhistle-deep);
+    background: white;
+  }
+  
+  .btn-secondary:hover {
+    background: var(--iwhistle-deep);
+    color: white;
+    transform: scale(1.02);
+  }
+  
+  .card-hover {
+    @apply transition-all duration-300;
+  }
+  
+  .card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  }
+  
+  .section-padding {
+    @apply py-16 md:py-20 lg:py-24;
+  }
+  
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8 xl:px-12;
+  }
+}
+
+@layer utilities {
+  .animate-in-view {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  
+  .animate-in-view.visible {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1), transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  html {
+    scroll-behavior: auto;
+  }
+}
