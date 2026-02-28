@@ -18,10 +18,11 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
 2. Feature overview (AI Rules Engine, Video Training, Mental Wellness, etc.)
 3. Pilot Program structure with pricing tiers (Track A & Track B)
 4. Success metrics with animated counters
-5. Partnership documents download section
-6. Interactive partnership agreement form with save/preview/download
+5. Partnership documents with inline viewing and PDF download
+6. Interactive partnership agreement form with validation, save/preview/download
 7. Contact CTA section
-8. Responsive design with mobile navigation
+8. Admin dashboard for managing partnership applications
+9. Responsive design with mobile navigation
 
 ## What's Been Implemented
 
@@ -43,27 +44,28 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
 
 ### Phase 2 - Feature Enhancements (Jan 2026)
 - [x] **Form Validation**: Inline error messages for all required fields, email/phone format validation, date ordering, min officials (10), price validation, validation summary banner, auto-scroll to first error
-- [x] **PDF Generation**: Client-side PDF generation using jsPDF with styled headers, section blocks, signature lines, and proper formatting. Available from both form and preview tabs
-- [x] **Admin Dashboard**: Full dashboard at /admin with:
-  - Stats cards (Total Applications, Pending Review, Approved, Total Value)
-  - Partnership applications table with search and status filter
-  - Detail modal with complete partnership information
-  - Status management (Pending/Approved/Rejected)
-  - Delete functionality with confirmation
-  - Back to Site navigation
-  - Refresh data capability
-- [x] Backend admin APIs: GET /api/admin/partnerships, GET /api/admin/stats, PUT /api/admin/partnerships/{id}/status, DELETE /api/admin/partnerships/{id}
-- [x] Form submission to backend with success/error feedback
-- [x] Footer link to Admin Dashboard
+- [x] **PDF Generation**: Client-side PDF generation using jsPDF with styled headers, section blocks, signature lines, and proper formatting
+- [x] **Admin Dashboard**: Full dashboard at /admin with stats cards, partnerships table, detail modal, status management, search/filter, delete functionality
+- [x] Backend admin APIs for partnership management
+
+### Phase 3 - Inline Document Viewer (Jan 2026)
+- [x] **Document Viewer**: Slide-in panel from right with backdrop blur overlay
+- [x] **Full Content**: Complete legal content for all 4 documents (Pilot Program Agreement 12 sections, DPA 9 sections, TOS 12 sections, Privacy Policy 11 sections)
+- [x] **Navigation**: Sticky header with scrollable TOC pills that highlight active section
+- [x] **Actions**: Print button, PDF download button, close button in viewer header
+- [x] **Formatting**: Section headings, subsections with blue left border, clean typography
+- [x] **UX**: Back-to-top button, smooth scrolling, responsive design (desktop/tablet/mobile)
+- [x] **Download**: Direct PDF download from card without opening viewer
+- [x] Documents include GDPR, CCPA, encryption, data retention, breach notification content
 
 ## Testing Status
 - Phase 1: 100% passed (backend, frontend, integration, mobile)
-- Phase 2: 100% passed (form validation, PDF generation, admin dashboard, integration)
+- Phase 2: 100% passed (form validation, PDF generation, admin dashboard)
+- Phase 3: 100% passed (document viewer, responsive design, UX, content quality)
 
 ## Backlog / Future Enhancements
-- P1: Server-side PDF generation endpoint (already built, needs frontend integration)
+- P1: Admin authentication/login to protect dashboard
 - P2: Email notification on form submission (SendGrid/Resend)
-- P2: Admin authentication/login
+- P2: Export partnerships to CSV from admin
 - P3: Multi-language support
 - P3: Dark mode toggle
-- P3: Export partnerships to CSV
