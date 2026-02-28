@@ -5,6 +5,9 @@ from typing import Optional
 import os
 from datetime import datetime, timezone
 from pymongo import MongoClient
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI()
 
