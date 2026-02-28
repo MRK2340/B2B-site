@@ -316,13 +316,11 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
   };
 
   const handleSubmit = async () => {
-    const newErrors = validate();
-    if (!newErrors) {
+    if (!validate()) {
       const firstErrorField = Object.keys(errors)[0] || Object.keys(requiredFields).find(f => !formData[f]?.toString().trim());
       if (firstErrorField) {
         document.getElementById(firstErrorField)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      validate();
       return;
     }
     if (!signatureData) {
