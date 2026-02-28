@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu } from 'lucide-react';
+import { Menu, LogOut, User, ShieldCheck } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { Sheet, SheetTrigger, SheetContent } from '../components/ui/sheet';
+import { useAuth } from '../context/AuthContext';
 
 const navLinks = [
   { label: 'Partnership', href: '#partnership' },
@@ -15,6 +17,13 @@ const navLinks = [
 export function Navbar() {
   const { isScrolled } = useScrollPosition();
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
 
   return (
     <motion.header
@@ -54,10 +63,42 @@ export function Navbar() {
             ))}
           </div>
 
-          <div className="hidden md:block">
-            <a href="#contact" className="btn-primary text-sm" data-testid="navbar-cta">
-              Get Started
-            </a>
+          {/* Auth section */}
+          <div className="hidden md:flex items-center gap-3">
+            {user && (
+              <div className="flex items-center gap-3">
+                <div className={`flex items-center gap-2 text-sm ${isScrolled ? 'text-iwhistle-deep' : 'text-white/90'}`} data-testid="navbar-user-info">
+                  <User className="w-4 h-4" />
+                  <span className="font-medium">{user.name}</span>
+                </div>
+                {user.role === 'admin' && (
+                  <Link
+                    to="/admin"
+                    data-testid="navbar-admin-link"
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                      isScrolled
+                        ? 'bg-iwhistle-blue/10 text-iwhistle-blue hover:bg-iwhistle-blue/20'
+                        : 'bg-white/10 text-white hover:bg-white/20'
+                    }`}
+                  >
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin
+                  </Link>
+                )}
+                <button
+                  onClick={handleLogout}
+                  data-testid="navbar-logout-btn"
+                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                    isScrolled
+                      ? 'text-gray-500 hover:text-red-600 hover:bg-red-50'
+                      : 'text-white/80 hover:text-white hover:bg-white/10'
+                  }`}
+                >
+                  <LogOut className="w-4 h-4" />
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -83,13 +124,23 @@ export function Navbar() {
                     {link.label}
                   </a>
                 ))}
-                <a
-                  href="#contact"
-                  onClick={() => setIsOpen(false)}
-                  className="btn-primary text-center mt-4"
-                >
-                  Get Started
-                </a>
+                {user && (
+                  <>
+                    <div className="border-t border-gray-100 pt-4">
+                      <p className="text-sm text-gray-500 mb-3">Signed in as <span className="font-medium text-iwhistle-deep">{user.name}</span></p>
+                      {user.role === 'admin' && (
+                        <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-iwhistle-blue font-medium mb-3">
+                          <ShieldCheck className="w-4 h-4" />
+                          Admin Dashboard
+                        </Link>
+                      )}
+                      <button onClick={() => { handleLogout(); setIsOpen(false); }} className="flex items-center gap-2 text-red-500 font-medium">
+                        <LogOut className="w-4 h-4" />
+                        Logout
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </SheetContent>
           </Sheet>
