@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Users, DollarSign, Clock, CheckCircle, XCircle,
-  Trash2, Eye, Download, RefreshCw, Search, Filter, ChevronDown
+  Trash2, Eye, RefreshCw, Search, Filter, ChevronDown
 } from 'lucide-react';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
