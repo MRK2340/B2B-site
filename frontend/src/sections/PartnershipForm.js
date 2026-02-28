@@ -602,6 +602,38 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
                     </div>
                   </div>
 
+                  <Separator />
+
+                  {/* Digital Signature Pad */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-iwhistle-deep mb-2 flex items-center gap-2">
+                      <PenLine className="w-5 h-5 text-iwhistle-blue" /> Digital Signature
+                      <span className="text-red-500 text-sm font-normal">*</span>
+                    </h3>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Draw your signature below to authorize this partnership agreement.
+                    </p>
+                    <SignaturePad
+                      onChange={setSignatureData}
+                      hasError={!!errors.signature}
+                    />
+                    <AnimatePresence>
+                      {errors.signature && (
+                        <motion.p initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }}
+                          className="flex items-center gap-1 mt-2 text-xs text-red-500" data-testid="error-signature">
+                          <AlertCircle className="w-3 h-3" />
+                          {errors.signature}
+                        </motion.p>
+                      )}
+                    </AnimatePresence>
+                    {signatureData && (
+                      <div className="mt-3 flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <span className="text-sm text-green-600 font-medium">Signature captured</span>
+                      </div>
+                    )}
+                  </div>
+
                   {/* Action Buttons */}
                   <div className="flex flex-col sm:flex-row gap-4 pt-4">
                     <motion.div className="flex-1" whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}>
