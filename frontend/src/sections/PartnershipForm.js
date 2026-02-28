@@ -610,7 +610,7 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
                   <Separator />
 
                   {/* Digital Signature Pad */}
-                  <div>
+                  <div id="signature-section">
                     <h3 className="text-lg font-semibold text-iwhistle-deep mb-2 flex items-center gap-2">
                       <PenLine className="w-5 h-5 text-iwhistle-blue" /> Digital Signature
                       <span className="text-red-500 text-sm font-normal">*</span>
