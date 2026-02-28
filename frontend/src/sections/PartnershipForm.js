@@ -316,13 +316,18 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
   };
 
   const handleSubmit = async () => {
+    const validationErrors = {};
     if (!validate()) {
       const firstErrorField = Object.keys(errors)[0] || Object.keys(requiredFields).find(f => !formData[f]?.toString().trim());
       if (firstErrorField) {
         document.getElementById(firstErrorField)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
-      // Re-validate to populate errors if validate was called before state updated
       validate();
+      return;
+    }
+    if (!signatureData) {
+      setErrors(prev => ({ ...prev, signature: 'Please draw your signature to authorize this agreement.' }));
+      document.getElementById('signature-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }
 
