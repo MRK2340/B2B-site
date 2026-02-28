@@ -18,24 +18,6 @@ import { Footer } from './sections/Footer';
 import { AdminDashboard } from './sections/AdminDashboard';
 import './App.css';
 
-function PartnerPortal() {
-  return (
-    <div className="min-h-screen bg-white" data-testid="partner-portal">
-      <Navbar />
-      <main>
-        <Hero />
-        <PartnershipOverview />
-        <PilotProgram />
-        <SuccessMetrics />
-        <Documents />
-        <PartnershipForm />
-        <ContactCTA />
-      </main>
-      <Footer />
-    </div>
-  );
-}
-
 function App() {
   return (
     <AuthProvider>

@@ -87,6 +87,7 @@ class PartnershipFormData(BaseModel):
     signatureDate: Optional[str] = ""
     perUserRate: Optional[str] = ""
     pilotDiscount: Optional[str] = ""
+    signature: Optional[str] = ""
 
 class PartnershipStatusUpdate(BaseModel):
     status: str
