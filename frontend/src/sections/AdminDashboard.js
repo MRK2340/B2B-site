@@ -253,9 +253,9 @@ export function AdminDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <Link to="/" className="flex items-center gap-2 text-gray-500 hover:text-iwhistle-blue transition-colors" data-testid="admin-back-link">
+              <Link to="/portal" className="flex items-center gap-2 text-gray-500 hover:text-iwhistle-blue transition-colors" data-testid="admin-back-link">
                 <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline text-sm">Back to Site</span>
+                <span className="hidden sm:inline text-sm">Back to Portal</span>
               </Link>
               <div className="h-6 w-px bg-gray-200" />
               <div className="flex items-center gap-2">
@@ -265,11 +265,23 @@ export function AdminDashboard() {
                 <h1 className="text-lg font-bold text-iwhistle-deep">Admin Dashboard</h1>
               </div>
             </div>
-            <button onClick={fetchData} disabled={loading} data-testid="refresh-btn"
-              className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">
-              <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-              Refresh
-            </button>
+            <div className="flex items-center gap-2">
+              <button onClick={handleExportCSV} disabled={loading || partnerships.length === 0} data-testid="export-csv-btn"
+                className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-iwhistle-blue bg-iwhistle-blue/10 rounded-lg hover:bg-iwhistle-blue/20 transition-colors disabled:opacity-50">
+                <Download className="w-4 h-4" />
+                Export CSV
+              </button>
+              <button onClick={fetchData} disabled={loading} data-testid="refresh-btn"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">
+                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                <span className="hidden sm:inline">Refresh</span>
+              </button>
+              <button onClick={handleLogout} data-testid="admin-logout-btn"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <LogOut className="w-4 h-4" />
+                <span className="hidden sm:inline">Logout</span>
+              </button>
+            </div>
           </div>
         </div>
       </header>
