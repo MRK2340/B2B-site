@@ -9,6 +9,7 @@ import { RadioGroup, RadioGroupItem } from '../components/ui/radio-group';
 import { Separator } from '../components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { jsPDF } from 'jspdf';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
