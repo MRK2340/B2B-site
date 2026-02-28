@@ -206,8 +206,7 @@ export function AdminDashboard() {
     }
   };
 
-    const exporting_headers = { Authorization: `Bearer ${token}` };
-    const res = await fetch(`${API_URL}/api/admin/partnerships`, { headers: exporting_headers });
+  const handleExportCSV = () => {
     const headers = ['Organization', 'Contact Name', 'Email', 'Phone', 'Org Type', 'Term', 'Officials', 'Rate', 'Discount', 'Status', 'Submitted'];
     const rows = partnerships.map(p => [
       p.partnerOrgName || '',
