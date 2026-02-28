@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Save, Download, CheckCircle, Building2, Users, Calendar, User, FileText, AlertCircle, Send } from 'lucide-react';
+import { Save, Download, CheckCircle, Building2, Users, Calendar, User, FileText, AlertCircle, Send, PenLine } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
@@ -10,6 +10,7 @@ import { Separator } from '../components/ui/separator';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { jsPDF } from 'jspdf';
 import { useAuth } from '../context/AuthContext';
+import { SignaturePad } from '../components/SignaturePad';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
