@@ -335,11 +335,12 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
           'Content-Type': 'application/json',
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, signature: signatureData || '' }),
       });
       if (!resp.ok) throw new Error('Submission failed');
       setSubmitStatus('success');
       localStorage.removeItem('iwhistlePartnershipForm');
+      if (onSubmitSuccess) onSubmitSuccess();
     } catch (err) {
       setSubmitStatus('error');
     } finally {
