@@ -1,18 +1,22 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional
 import os
 import io
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pymongo import MongoClient
 from dotenv import load_dotenv
+from jose import JWTError, jwt
+from passlib.context import CryptContext
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table as RLTable, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+import resend
 
 load_dotenv()
 
@@ -28,8 +32,35 @@ app.add_middleware(
 
 MONGO_URL = os.environ.get("MONGO_URL")
 DB_NAME = os.environ.get("DB_NAME")
+SECRET_KEY = os.environ.get("SECRET_KEY")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_HOURS = 24
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
+ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL")
+
 client = MongoClient(MONGO_URL)
 db = client[DB_NAME]
+
+if RESEND_API_KEY:
+    resend.api_key = RESEND_API_KEY
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+security = HTTPBearer()
+security_optional = HTTPBearer(auto_error=False)
+
+
+# ─── Pydantic Models ──────────────────────────────────────────────────────────
+
+class UserRegister(BaseModel):
+    name: str
+    organization: str
+    email: str
+    password: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
 class PartnershipFormData(BaseModel):
     partnerOrgName: str
@@ -60,6 +91,94 @@ class PartnershipFormData(BaseModel):
 class PartnershipStatusUpdate(BaseModel):
     status: str
 
+
+# ─── Auth Utilities ───────────────────────────────────────────────────────────
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain: str, hashed: str) -> bool:
+    return pwd_context.verify(plain, hashed)
+
+def create_token(data: dict) -> str:
+    expire = datetime.now(timezone.utc) + timedelta(hours=ACCESS_TOKEN_EXPIRE_HOURS)
+    return jwt.encode({**data, "exp": expire}, SECRET_KEY, algorithm=ALGORITHM)
+
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
+    try:
+        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user = db.users.find_one({"email": email}, {"_id": 0, "password_hash": 0})
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid or expired token")
+
+def require_admin(user: dict = Depends(get_current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required")
+    return user
+
+
+# ─── Seed Admin User ──────────────────────────────────────────────────────────
+
+def seed_admin():
+    existing = db.users.find_one({"email": "admin@i-whistle.com"})
+    if not existing:
+        db.users.insert_one({
+            "name": "Admin",
+            "organization": "iWhistle",
+            "email": "admin@i-whistle.com",
+            "password_hash": hash_password("admin123"),
+            "role": "admin",
+            "created_at": datetime.now(timezone.utc).isoformat(),
+        })
+
+seed_admin()
+
+
+# ─── Email Helper ─────────────────────────────────────────────────────────────
+
+def send_new_application_email(data: dict):
+    if not RESEND_API_KEY:
+        return
+    try:
+        html = f"""
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: linear-gradient(135deg, #003D7A, #0080C8); padding: 24px; border-radius: 8px 8px 0 0;">
+            <h1 style="color: white; margin: 0; font-size: 22px;">iWhistle</h1>
+            <p style="color: rgba(255,255,255,0.8); margin: 4px 0 0 0; font-size: 14px;">New Partnership Application</p>
+          </div>
+          <div style="background: #f9fafb; padding: 24px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb;">
+            <h2 style="color: #003D7A; font-size: 18px;">Application Details</h2>
+            <table style="width: 100%; border-collapse: collapse;">
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Organization:</td><td style="padding: 6px 0; font-weight: 600; font-size: 14px;">{data.get('partnerOrgName', 'N/A')}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Contact:</td><td style="padding: 6px 0; font-size: 14px;">{data.get('contactName', 'N/A')}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Email:</td><td style="padding: 6px 0; font-size: 14px;">{data.get('contactEmail', 'N/A')}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Submitted:</td><td style="padding: 6px 0; font-size: 14px;">{data.get('created_at', 'N/A')}</td></tr>
+            </table>
+            <div style="margin-top: 24px; padding: 16px; background: white; border-radius: 6px; border-left: 4px solid #0080C8;">
+              <p style="margin: 0; color: #374151; font-size: 14px;">Login to the <strong>Admin Dashboard</strong> to review and manage this application.</p>
+            </div>
+          </div>
+        </div>
+        """
+        params = {
+            "from": SENDER_EMAIL,
+            "to": [ADMIN_NOTIFICATION_EMAIL],
+            "subject": f"New Partnership Application: {data.get('partnerOrgName', 'Unknown')}",
+            "html": html,
+        }
+        resend.Emails.send(params)
+    except Exception as e:
+        print(f"Email notification failed: {e}")
+
+
+# ─── Health & Root ────────────────────────────────────────────────────────────
+
 @app.get("/")
 def read_root():
     return {"message": "iWhistle B2B Partnership Portal Backend"}
@@ -68,21 +187,67 @@ def read_root():
 def health_check():
     return {"status": "healthy"}
 
+
+# ─── Auth Endpoints ───────────────────────────────────────────────────────────
+
+@app.post("/api/auth/register")
+def register(user_data: UserRegister):
+    if db.users.find_one({"email": user_data.email}):
+        raise HTTPException(status_code=400, detail="Email already registered")
+    db.users.insert_one({
+        "name": user_data.name,
+        "organization": user_data.organization,
+        "email": user_data.email,
+        "password_hash": hash_password(user_data.password),
+        "role": "partner",
+        "created_at": datetime.now(timezone.utc).isoformat(),
+    })
+    token = create_token({"sub": user_data.email})
+    return {
+        "token": token,
+        "user": {"email": user_data.email, "name": user_data.name, "role": "partner", "organization": user_data.organization},
+    }
+
+@app.post("/api/auth/login")
+def login(credentials: UserLogin):
+    user = db.users.find_one({"email": credentials.email})
+    if not user or not verify_password(credentials.password, user["password_hash"]):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    token = create_token({"sub": user["email"]})
+    return {
+        "token": token,
+        "user": {
+            "email": user["email"],
+            "name": user["name"],
+            "role": user["role"],
+            "organization": user.get("organization", ""),
+        },
+    }
+
+@app.get("/api/auth/me")
+def get_me(user: dict = Depends(get_current_user)):
+    return {"user": user}
+
+
+# ─── Partnership Endpoints ────────────────────────────────────────────────────
+
 @app.post("/api/partnerships")
-def submit_partnership(form_data: PartnershipFormData):
+def submit_partnership(form_data: PartnershipFormData, user: dict = Depends(get_current_user)):
     data = form_data.dict()
     data["created_at"] = datetime.now(timezone.utc).isoformat()
     data["status"] = "pending"
+    data["submitted_by"] = user["email"]
     result = db.partnerships.insert_one(data)
+    send_new_application_email(data)
     return {"status": "success", "id": str(result.inserted_id)}
 
 @app.get("/api/partnerships")
-def get_partnerships():
-    partnerships = list(db.partnerships.find({}, {"_id": 0}))
+def get_partnerships(user: dict = Depends(get_current_user)):
+    partnerships = list(db.partnerships.find({"submitted_by": user["email"]}, {"_id": 0}))
     return {"partnerships": partnerships}
 
 @app.get("/api/admin/partnerships")
-def admin_get_partnerships():
+def admin_get_partnerships(user: dict = Depends(require_admin)):
     partnerships = []
     for doc in db.partnerships.find({}).sort("created_at", -1):
         doc["id"] = str(doc["_id"])
@@ -91,7 +256,7 @@ def admin_get_partnerships():
     return {"partnerships": partnerships}
 
 @app.put("/api/admin/partnerships/{partnership_id}/status")
-def update_partnership_status(partnership_id: str, update: PartnershipStatusUpdate):
+def update_partnership_status(partnership_id: str, update: PartnershipStatusUpdate, user: dict = Depends(require_admin)):
     from bson import ObjectId
     result = db.partnerships.update_one(
         {"_id": ObjectId(partnership_id)},
@@ -102,7 +267,7 @@ def update_partnership_status(partnership_id: str, update: PartnershipStatusUpda
     return {"status": "success"}
 
 @app.delete("/api/admin/partnerships/{partnership_id}")
-def delete_partnership(partnership_id: str):
+def delete_partnership(partnership_id: str, user: dict = Depends(require_admin)):
     from bson import ObjectId
     result = db.partnerships.delete_one({"_id": ObjectId(partnership_id)})
     if result.deleted_count == 0:
@@ -110,7 +275,7 @@ def delete_partnership(partnership_id: str):
     return {"status": "success"}
 
 @app.get("/api/admin/stats")
-def admin_stats():
+def admin_stats(user: dict = Depends(require_admin)):
     total = db.partnerships.count_documents({})
     pending = db.partnerships.count_documents({"status": "pending"})
     approved = db.partnerships.count_documents({"status": "approved"})
@@ -136,7 +301,7 @@ def admin_stats():
     }
 
 @app.post("/api/partnerships/{partnership_id}/pdf")
-def generate_partnership_pdf(partnership_id: str):
+def generate_partnership_pdf(partnership_id: str, user: dict = Depends(get_current_user)):
     from bson import ObjectId
     doc = db.partnerships.find_one({"_id": ObjectId(partnership_id)})
     if not doc:
