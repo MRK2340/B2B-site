@@ -201,6 +201,25 @@ def main():
     if not success:
         print("❌ Getting partnerships failed")
 
+    print("\n📊 Testing Admin APIs...")
+    
+    # Test admin get partnerships
+    if not tester.test_admin_get_partnerships():
+        print("❌ Admin get partnerships failed")
+    
+    # Test admin get stats
+    if not tester.test_admin_get_stats():
+        print("❌ Admin get stats failed")
+    
+    # Test admin update partnership status (if we have an ID)
+    if tester.partnership_id:
+        if not tester.test_admin_update_partnership_status(tester.partnership_id, "approved"):
+            print("❌ Admin update partnership status failed")
+        
+        # Test admin delete partnership (this will remove the test partnership)
+        if not tester.test_admin_delete_partnership(tester.partnership_id):
+            print("❌ Admin delete partnership failed")
+
     # Print final results
     print(f"\n📊 Backend API Test Results: {tester.tests_passed}/{tester.tests_run} passed")
     
