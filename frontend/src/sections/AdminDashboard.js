@@ -233,8 +233,8 @@ export function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    logout();
     navigate('/');
+    logout();
   };
 
   const filtered = partnerships.filter(p => {
