@@ -5,16 +5,29 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
 
 ## Architecture
 - **Frontend**: React 18 + Tailwind CSS + Framer Motion + shadcn/ui (Radix UI) + jsPDF + React Router
-- **Backend**: FastAPI (Python) + MongoDB + ReportLab (server-side PDF)
+- **Backend**: FastAPI (Python) + MongoDB + ReportLab (server-side PDF) + python-jose (JWT) + passlib (bcrypt) + resend
 - **Deployment**: Kubernetes container with supervisor-managed services
 
 ## User Personas
 - **B2B Partners**: Youth leagues, basketball camps, officiating organizations looking to partner with iWhistle
-- **Administrators**: Organization leaders completing partnership agreements
 - **Admin Users**: iWhistle staff reviewing and managing partnership applications
 
+## Routes
+- `/` - Public homepage (basic info + login/register CTAs)
+- `/login` - Login page
+- `/register` - Partner registration page
+- `/portal` - Protected partner portal (all site sections, requires login)
+- `/admin` - Protected admin dashboard (requires admin role)
+
+## Auth
+- JWT-based authentication (python-jose, passlib/bcrypt)
+- Two roles: `admin` and `partner`
+- Admin seed: admin@i-whistle.com / admin123
+- Token stored in localStorage as `iwhistle_token`
+- Protected routes via `ProtectedRoute` component with `adminOnly` prop
+
 ## Core Requirements
-1. Marketing/landing page showcasing iWhistle's B2B partnership offering
+1. Marketing/landing page showcasing iWhistle's B2B partnership offering (gated behind login)
 2. Feature overview (AI Rules Engine, Video Training, Mental Wellness, etc.)
 3. Pilot Program structure with pricing tiers (Track A & Track B)
 4. Success metrics with animated counters
@@ -58,14 +71,60 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
 - [x] **Download**: Direct PDF download from card without opening viewer
 - [x] Documents include GDPR, CCPA, encryption, data retention, breach notification content
 
+### Phase 4 - Authentication, Gated Portal & CSV Export (Feb 2026)
+- [x] **Public Homepage**: New `/` route with about section, key selling points, stats, login/register CTAs
+- [x] **JWT Authentication**: python-jose + passlib/bcrypt, 24hr tokens, stored in localStorage
+- [x] **Two-Role Auth**: `admin` and `partner` roles with role-based access control
+- [x] **Login Page**: Email/password form at `/login` with error handling, password toggle
+- [x] **Register Page**: Partner registration at `/register` with name, org, email, password + strength indicator
+- [x] **Protected Routes**: `ProtectedRoute` component redirects unauthenticated to `/login`, non-admin to `/portal`
+- [x] **Gated Portal**: All site content moved to `/portal`, requires authentication
+- [x] **Auth-aware Navbar**: Shows user name, logout button, and Admin link for admin users
+- [x] **Admin Dashboard Protection**: All admin API endpoints require admin JWT token
+- [x] **CSV Export**: "Export CSV" button in admin dashboard generates and downloads partnership data
+- [x] **Email Notifications**: Resend integration ready (silent no-op when RESEND_API_KEY not set)
+- [x] Admin seed user created on startup
+
 ## Testing Status
-- Phase 1: 100% passed (backend, frontend, integration, mobile)
-- Phase 2: 100% passed (form validation, PDF generation, admin dashboard)
-- Phase 3: 100% passed (document viewer, responsive design, UX, content quality)
+- Phase 1: 100% passed
+- Phase 2: 100% passed
+- Phase 3: 100% passed
+- Phase 4: 100% passed (16/16 features, minor logout redirect bug fixed)
+
+## API Endpoints
+- `GET /api/health` - Health check
+- `POST /api/auth/register` - Partner registration
+- `POST /api/auth/login` - Login (returns JWT)
+- `GET /api/auth/me` - Get current user (auth required)
+- `POST /api/partnerships` - Submit partnership application (auth required)
+- `GET /api/partnerships` - Get user's own applications (auth required)
+- `GET /api/admin/partnerships` - Get all applications (admin required)
+- `PUT /api/admin/partnerships/{id}/status` - Update status (admin required)
+- `DELETE /api/admin/partnerships/{id}` - Delete application (admin required)
+- `GET /api/admin/stats` - Dashboard stats (admin required)
+- `POST /api/partnerships/{id}/pdf` - Generate PDF (auth required)
+
+## DB Schema
+### users
+`{ name, organization, email, password_hash, role, created_at }`
+
+### partnerships
+`{ partnerOrgName, partnerEntityType, partnerState, partnerAddress, partnerCity, partnerZip, contactName, contactTitle, contactEmail, contactPhone, termStructure, startDate, endDate, numOfficials, orgType, championName, championTitle, championEmail, championPhone, signerName, signerTitle, signatureDate, perUserRate, pilotDiscount, created_at, status, submitted_by }`
+
+## Environment Variables
+### backend/.env
+- `MONGO_URL` - MongoDB connection string
+- `DB_NAME` - Database name
+- `SECRET_KEY` - JWT signing secret
+- `RESEND_API_KEY` - Resend API key (empty = email notifications disabled)
+- `SENDER_EMAIL` - From email for notifications
+- `ADMIN_NOTIFICATION_EMAIL` - Admin email for new submission alerts
 
 ## Backlog / Future Enhancements
-- P1: Admin authentication/login to protect dashboard
-- P2: Email notification on form submission (SendGrid/Resend)
-- P2: Export partnerships to CSV from admin
+- P1: Activate Resend email notifications (need RESEND_API_KEY from user)
+- P1: Real-time Chat Widget for instant partner support
+- P2: E-Signature Integration (DocuSign/HelloSign) for partnership agreements
+- P2: Partner Spotlight Section on homepage
+- P3: Partner can track their own application status from portal
 - P3: Multi-language support
 - P3: Dark mode toggle
