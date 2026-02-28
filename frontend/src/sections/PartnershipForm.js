@@ -73,13 +73,14 @@ function FormField({ label, id, error, children, required = true }) {
   );
 }
 
-export function PartnershipForm() {
+export function PartnershipForm({ onSubmitSuccess }) {
   const [formData, setFormData] = useState(initialFormData);
   const [errors, setErrors] = useState({});
   const [isSaved, setIsSaved] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [activeTab, setActiveTab] = useState('form');
+  const [signatureData, setSignatureData] = useState(null);
   const { token } = useAuth();
 
   useEffect(() => {
