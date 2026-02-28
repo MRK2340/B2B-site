@@ -1,10 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Users, DollarSign, Clock, CheckCircle, XCircle,
-  Trash2, Eye, RefreshCw, Search, Filter, ChevronDown
+  Trash2, Eye, RefreshCw, Search, Filter, ChevronDown, Download, LogOut
 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
