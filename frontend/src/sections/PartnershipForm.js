@@ -329,7 +329,10 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
     try {
       const resp = await fetch(`${API_URL}/api/partnerships`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(formData),
       });
       if (!resp.ok) throw new Error('Submission failed');
