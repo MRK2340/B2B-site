@@ -86,9 +86,7 @@ export function Footer() {
         <div className="max-w-7xl mx-auto container-padding py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-white/50 text-sm">&copy; 2026 iWhistle, LLC. All rights reserved.</p>
-            <Link to="/admin" className="text-white/50 text-sm hover:text-iwhistle-orange transition-colors" data-testid="admin-link">
-              Admin Dashboard
-            </Link>
+            <p className="text-white/30 text-sm">Leadership Under Pressure</p>
           </div>
         </div>
       </div>
