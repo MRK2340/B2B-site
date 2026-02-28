@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const quickLinks = [
   { label: 'Home', href: '#' },
@@ -85,7 +86,9 @@ export function Footer() {
         <div className="max-w-7xl mx-auto container-padding py-6">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <p className="text-white/50 text-sm">&copy; 2026 iWhistle, LLC. All rights reserved.</p>
-            <p className="text-white/50 text-sm">B2B Partnership Portal</p>
+            <Link to="/admin" className="text-white/50 text-sm hover:text-iwhistle-orange transition-colors" data-testid="admin-link">
+              Admin Dashboard
+            </Link>
           </div>
         </div>
       </div>
