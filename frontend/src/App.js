@@ -6,15 +6,6 @@ import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import PartnerDashboard from './pages/PartnerDashboard';
-import { Navbar } from './sections/Navbar';
-import { Hero } from './sections/Hero';
-import { PartnershipOverview } from './sections/PartnershipOverview';
-import { PilotProgram } from './sections/PilotProgram';
-import { SuccessMetrics } from './sections/SuccessMetrics';
-import { Documents } from './sections/Documents';
-import { PartnershipForm } from './sections/PartnershipForm';
-import { ContactCTA } from './sections/ContactCTA';
-import { Footer } from './sections/Footer';
 import { AdminDashboard } from './sections/AdminDashboard';
 import './App.css';
 
