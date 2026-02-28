@@ -124,6 +124,55 @@ class iWhistleAPITester:
         )
         return success, response
 
+    def test_admin_get_partnerships(self):
+        """Test admin getting partnerships"""
+        success, response = self.run_test(
+            "Admin Get Partnerships",
+            "GET",
+            "api/admin/partnerships",
+            200
+        )
+        return success, response
+
+    def test_admin_get_stats(self):
+        """Test admin statistics endpoint"""
+        success, response = self.run_test(
+            "Admin Get Stats",
+            "GET",
+            "api/admin/stats",
+            200
+        )
+        return success, response
+
+    def test_admin_update_partnership_status(self, partnership_id, new_status):
+        """Test updating partnership status"""
+        if not partnership_id:
+            print("❌ No partnership ID available for status update test")
+            return False
+        
+        success, response = self.run_test(
+            f"Admin Update Partnership Status to {new_status}",
+            "PUT",
+            f"api/admin/partnerships/{partnership_id}/status",
+            200,
+            data={"status": new_status}
+        )
+        return success, response
+
+    def test_admin_delete_partnership(self, partnership_id):
+        """Test deleting partnership"""
+        if not partnership_id:
+            print("❌ No partnership ID available for delete test")
+            return False
+        
+        success, response = self.run_test(
+            "Admin Delete Partnership",
+            "DELETE",
+            f"api/admin/partnerships/{partnership_id}",
+            200
+        )
+        return success, response
+
 def main():
     print("🚀 Starting iWhistle B2B Partnership Portal API Tests")
     print("=" * 60)
