@@ -79,6 +79,7 @@ export function PartnershipForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
   const [activeTab, setActiveTab] = useState('form');
+  const { token } = useAuth();
 
   useEffect(() => {
     const saved = localStorage.getItem('iwhistlePartnershipForm');
