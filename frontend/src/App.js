@@ -5,6 +5,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
+import PartnerDashboard from './pages/PartnerDashboard';
 import { Navbar } from './sections/Navbar';
 import { Hero } from './sections/Hero';
 import { PartnershipOverview } from './sections/PartnershipOverview';
@@ -47,7 +48,7 @@ function App() {
             path="/portal"
             element={
               <ProtectedRoute>
-                <PartnerPortal />
+                <PartnerDashboard />
               </ProtectedRoute>
             }
           />

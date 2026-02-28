@@ -243,7 +243,11 @@ def submit_partnership(form_data: PartnershipFormData, user: dict = Depends(get_
 
 @app.get("/api/partnerships")
 def get_partnerships(user: dict = Depends(get_current_user)):
-    partnerships = list(db.partnerships.find({"submitted_by": user["email"]}, {"_id": 0}))
+    partnerships = []
+    for doc in db.partnerships.find({"submitted_by": user["email"]}).sort("created_at", -1):
+        doc["id"] = str(doc["_id"])
+        del doc["_id"]
+        partnerships.append(doc)
     return {"partnerships": partnerships}
 
 @app.get("/api/admin/partnerships")
