@@ -155,13 +155,17 @@ export function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const { token, user, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const authHeaders = { Authorization: `Bearer ${token}` };
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     try {
       const [pRes, sRes] = await Promise.all([
-        fetch(`${API_URL}/api/admin/partnerships`),
-        fetch(`${API_URL}/api/admin/stats`),
+        fetch(`${API_URL}/api/admin/partnerships`, { headers: authHeaders }),
+        fetch(`${API_URL}/api/admin/stats`, { headers: authHeaders }),
       ]);
       const pData = await pRes.json();
       const sData = await sRes.json();
@@ -172,7 +176,7 @@ export function AdminDashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
