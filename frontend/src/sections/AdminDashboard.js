@@ -232,8 +232,8 @@ export function AdminDashboard() {
   };
 
   const handleLogout = () => {
-    navigate('/');
     logout();
+    window.location.href = '/';
   };
 
   const filtered = partnerships.filter(p => {

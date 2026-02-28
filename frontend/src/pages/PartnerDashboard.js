@@ -405,8 +405,8 @@ export default function PartnerDashboard() {
   };
 
   const handleLogout = () => {
-    navigate('/');
     logout();
+    window.location.href = '/';
   };
 
   const SidebarContent = () => (
