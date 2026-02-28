@@ -222,6 +222,86 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Partner Spotlight */}
+      <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}>
+              <span className="inline-block px-4 py-1.5 bg-iwhistle-orange/10 text-iwhistle-orange rounded-full text-sm font-medium mb-4">
+                PARTNER SPOTLIGHT
+              </span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-iwhistle-deep mb-4">
+                Trusted by organizations across the nation
+              </h2>
+              <p className="text-gray-500 text-lg max-w-xl mx-auto">
+                See how iWhistle is transforming officiating programs at every level.
+              </p>
+            </motion.div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "Our officials saw measurable improvement in their rules knowledge within the first month. The AI engine is genuinely impressive — it's like having an expert on call 24/7.",
+                name: 'Sarah Johnson',
+                title: 'Director of Officials',
+                org: 'Mid-America Youth Basketball',
+                initials: 'SJ',
+                metric: '60% fewer rules disputes',
+              },
+              {
+                quote: "The video training library transformed how we prepare referees for the postseason. iWhistle gives our officials a competitive edge that we simply couldn't build ourselves.",
+                name: 'Marcus Williams',
+                title: 'Executive Director',
+                org: 'Capital City Officials Association',
+                initials: 'MW',
+                metric: '3x faster onboarding',
+              },
+              {
+                quote: "Mental wellness programming has had a real impact on how our officials handle pressure in tight games. The retention improvement alone made the investment worthwhile.",
+                name: 'Jennifer Park',
+                title: 'Program Administrator',
+                org: 'Pacific Northwest Officials Association',
+                initials: 'JP',
+                metric: '40% higher retention rate',
+              },
+            ].map((t, i) => (
+              <motion.div key={t.name} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }} transition={{ delay: i * 0.15 }}
+                className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col hover:shadow-md transition-shadow"
+                data-testid={`spotlight-card-${i}`}>
+                <div className="flex-1">
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(5)].map((_, si) => (
+                      <svg key={si} className="w-4 h-4 text-iwhistle-orange" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <blockquote className="text-gray-600 text-sm leading-relaxed mb-6 italic">
+                    &ldquo;{t.quote}&rdquo;
+                  </blockquote>
+                </div>
+                <div className="border-t border-gray-100 pt-5 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
+                      <span className="text-white font-bold text-sm">{t.initials}</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold text-sm text-iwhistle-deep">{t.name}</p>
+                      <p className="text-xs text-gray-400">{t.title}, {t.org}</p>
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs font-semibold text-green-600 bg-green-50 px-2.5 py-1 rounded-full whitespace-nowrap">{t.metric}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Benefits */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
