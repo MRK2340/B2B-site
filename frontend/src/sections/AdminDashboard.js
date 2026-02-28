@@ -183,7 +183,7 @@ export function AdminDashboard() {
     try {
       await fetch(`${API_URL}/api/admin/partnerships/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json', ...authHeaders },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status }),
       });
       fetchData();
@@ -198,7 +198,7 @@ export function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this partnership application?')) return;
     try {
-      await fetch(`${API_URL}/api/admin/partnerships/${id}`, { method: 'DELETE', headers: authHeaders });
+      await fetch(`${API_URL}/api/admin/partnerships/${id}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
       fetchData();
       if (selectedPartnership?.id === id) setSelectedPartnership(null);
     } catch (err) {
@@ -206,7 +206,8 @@ export function AdminDashboard() {
     }
   };
 
-  const handleExportCSV = () => {
+    const exporting_headers = { Authorization: `Bearer ${token}` };
+    const res = await fetch(`${API_URL}/api/admin/partnerships`, { headers: exporting_headers });
     const headers = ['Organization', 'Contact Name', 'Email', 'Phone', 'Org Type', 'Term', 'Officials', 'Rate', 'Discount', 'Status', 'Submitted'];
     const rows = partnerships.map(p => [
       p.partnerOrgName || '',
