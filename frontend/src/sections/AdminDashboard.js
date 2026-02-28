@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Users, DollarSign, Clock, CheckCircle, XCircle,
   Trash2, Eye, RefreshCw, Search, Filter, ChevronDown, Download, LogOut
