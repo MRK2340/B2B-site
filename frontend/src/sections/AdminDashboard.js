@@ -184,7 +184,7 @@ export function AdminDashboard() {
     try {
       await fetch(`${API_URL}/api/admin/partnerships/${id}/status`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...authHeaders },
         body: JSON.stringify({ status }),
       });
       fetchData();
@@ -199,12 +199,42 @@ export function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this partnership application?')) return;
     try {
-      await fetch(`${API_URL}/api/admin/partnerships/${id}`, { method: 'DELETE' });
+      await fetch(`${API_URL}/api/admin/partnerships/${id}`, { method: 'DELETE', headers: authHeaders });
       fetchData();
       if (selectedPartnership?.id === id) setSelectedPartnership(null);
     } catch (err) {
       console.error('Failed to delete:', err);
     }
+  };
+
+  const handleExportCSV = () => {
+    const headers = ['Organization', 'Contact Name', 'Email', 'Phone', 'Org Type', 'Term', 'Officials', 'Rate', 'Discount', 'Status', 'Submitted'];
+    const rows = partnerships.map(p => [
+      p.partnerOrgName || '',
+      p.contactName || '',
+      p.contactEmail || '',
+      p.contactPhone || '',
+      p.orgType || '',
+      p.termStructure || '',
+      p.numOfficials || '',
+      p.perUserRate || '',
+      p.pilotDiscount || '',
+      p.status || '',
+      p.created_at ? new Date(p.created_at).toLocaleDateString() : '',
+    ]);
+    const csvContent = [headers, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `iWhistle-Partnerships-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   const filtered = partnerships.filter(p => {
