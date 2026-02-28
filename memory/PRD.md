@@ -85,7 +85,20 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
 - [x] **Email Notifications**: Resend integration ready (silent no-op when RESEND_API_KEY not set)
 - [x] Admin seed user created on startup
 
-## Testing Status
+### Phase 5 - Partner Dashboard, Spotlight & E-Signature (Feb 2026)
+- [x] **Partner Dashboard**: Complete dashboard at `/portal` with sidebar navigation replacing scrollable portal
+  - Overview tab: Welcome card, 4 stats cards, 3 quick action cards
+  - My Applications tab: Table of user's applications with status badges + detail modal + empty state
+  - Documents tab: 4 document cards with View (DocumentViewer) and Download buttons
+  - Apply tab: Full partnership form embedded in dashboard
+- [x] **Partner Application Status Tracking**: Real-time status from backend in My Applications tab
+- [x] **Partner Spotlight Section**: 3 testimonial cards on public homepage with star ratings, quotes, metrics
+- [x] **In-App Signature Pad**: react-signature-canvas drawn signature added to partnership form
+  - Required validation before submission
+  - Signature stored as base64 PNG in database
+  - Displayed in application detail modal
+- [x] **Mobile Dashboard**: Bottom navigation bar for mobile + slide-out sidebar
+- [x] **Backend**: GET /api/partnerships now returns `id` field + signature field in PartnershipFormData
 - Phase 1: 100% passed
 - Phase 2: 100% passed
 - Phase 3: 100% passed
