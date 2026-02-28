@@ -106,6 +106,12 @@ class iWhistleAPITester:
             200,
             data=test_data
         )
+        
+        # Store the partnership ID for later tests
+        if success and isinstance(response, dict) and 'id' in response:
+            self.partnership_id = response['id']
+            print(f"📝 Stored partnership ID: {self.partnership_id}")
+        
         return success, response
 
     def test_get_partnerships(self):
