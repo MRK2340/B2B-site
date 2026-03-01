@@ -136,7 +136,6 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
 ## Backlog / Future Enhancements
 - P1: Activate Resend email notifications (need RESEND_API_KEY from user)
 - P1: Real-time Chat Widget for instant partner support
-- P2: E-Signature metadata (timestamp, IP) for legal compliance
 - P3: Program details tabs in dashboard (PilotProgram, SuccessMetrics sections)
 - P3: Multi-language support
 - P3: Dark mode toggle
