@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Users, DollarSign, Clock, CheckCircle, XCircle,
-  Trash2, Eye, RefreshCw, Search, Filter, ChevronDown, Download, LogOut
+  Trash2, Eye, RefreshCw, Search, Filter, ChevronDown, Download,
+  LogOut, Shield, Monitor, MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
