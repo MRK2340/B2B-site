@@ -415,7 +415,6 @@ export default function PartnerDashboard() {
   const [loadingApps, setLoadingApps] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { user, token, logout } = useAuth();
-  const navigate = useNavigate();
 
   const fetchApplications = useCallback(async () => {
     if (!token) return;
