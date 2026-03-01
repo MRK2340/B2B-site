@@ -5,7 +5,7 @@ import {
   LayoutDashboard, FileCheck2, BookOpen, PenLine, LogOut,
   ChevronRight, Clock, CheckCircle, XCircle, Eye, Download,
   RefreshCw, Users, Building2, X, Menu, Loader2, FileText,
-  Shield, Scale, Lock
+  Shield, Scale, Lock, MapPin, Monitor
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { PartnershipForm } from '../sections/PartnershipForm';
