@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';import {
+import {
   LayoutDashboard, FileCheck2, BookOpen, PenLine, LogOut,
   ChevronRight, Clock, CheckCircle, XCircle, Eye, Download,
   RefreshCw, Users, Building2, X, Menu, Loader2, FileText,
