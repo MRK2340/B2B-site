@@ -233,11 +233,21 @@ def get_me(user: dict = Depends(get_current_user)):
 # ─── Partnership Endpoints ────────────────────────────────────────────────────
 
 @app.post("/api/partnerships")
-def submit_partnership(form_data: PartnershipFormData, user: dict = Depends(get_current_user)):
+def submit_partnership(form_data: PartnershipFormData, request: Request, user: dict = Depends(get_current_user)):
     data = form_data.dict()
     data["created_at"] = datetime.now(timezone.utc).isoformat()
     data["status"] = "pending"
     data["submitted_by"] = user["email"]
+
+    # Capture signature metadata for legal compliance
+    forwarded_for = request.headers.get("X-Forwarded-For", "")
+    ip_address = forwarded_for.split(",")[0].strip() if forwarded_for else (request.client.host if request.client else "unknown")
+    data["signature_metadata"] = {
+        "signed_at": datetime.now(timezone.utc).isoformat(),
+        "ip_address": ip_address,
+        "user_agent": request.headers.get("User-Agent", "unknown"),
+    }
+
     result = db.partnerships.insert_one(data)
     send_new_application_email(data)
     return {"status": "success", "id": str(result.inserted_id)}
