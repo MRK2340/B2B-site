@@ -125,6 +125,61 @@ function PartnershipDetailModal({ partnership, onClose, onStatusChange }) {
               ['Date', partnership.signatureDate],
             ]} />
           </div>
+
+          {/* Signature & Legal Compliance */}
+          {(partnership.signature || partnership.signature_metadata) && (
+            <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/50" data-testid="signature-compliance-section">
+              <h4 className="text-sm font-semibold text-iwhistle-blue mb-4 flex items-center gap-2">
+                <Shield className="w-4 h-4" /> Digital Signature &amp; Compliance Record
+              </h4>
+              {partnership.signature && (
+                <div className="mb-4">
+                  <p className="text-xs text-gray-400 mb-2">Drawn Signature</p>
+                  <img
+                    src={partnership.signature}
+                    alt="Partner Signature"
+                    data-testid="admin-signature-img"
+                    className="border border-gray-200 rounded-lg p-3 bg-white max-h-24 max-w-full"
+                  />
+                </div>
+              )}
+              {partnership.signature_metadata && (
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="bg-white rounded-lg p-3 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="w-3.5 h-3.5 text-iwhistle-blue" />
+                      <p className="text-xs font-medium text-gray-500">Signed At</p>
+                    </div>
+                    <p className="text-xs text-gray-800 font-semibold" data-testid="admin-sig-timestamp">
+                      {partnership.signature_metadata.signed_at
+                        ? new Date(partnership.signature_metadata.signed_at).toLocaleString()
+                        : '-'}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-1">
+                      <MapPin className="w-3.5 h-3.5 text-iwhistle-blue" />
+                      <p className="text-xs font-medium text-gray-500">IP Address</p>
+                    </div>
+                    <p className="text-xs text-gray-800 font-semibold font-mono" data-testid="admin-sig-ip">
+                      {partnership.signature_metadata.ip_address || '-'}
+                    </p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 border border-gray-100">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Monitor className="w-3.5 h-3.5 text-iwhistle-blue" />
+                      <p className="text-xs font-medium text-gray-500">Device / Browser</p>
+                    </div>
+                    <p className="text-xs text-gray-700 truncate" data-testid="admin-sig-useragent" title={partnership.signature_metadata.user_agent}>
+                      {partnership.signature_metadata.user_agent
+                        ? partnership.signature_metadata.user_agent.split(' ').slice(0, 3).join(' ') + '...'
+                        : '-'}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
