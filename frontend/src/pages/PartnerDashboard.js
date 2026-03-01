@@ -135,6 +135,49 @@ function AppDetailModal({ app, onClose }) {
               <img src={app.signature} alt="Signature" className="border border-gray-200 rounded-lg p-2 max-h-20 bg-gray-50" />
             </div>
           )}
+
+          {/* Signature Metadata */}
+          {app.signature_metadata && (
+            <div className="border border-gray-100 rounded-xl p-4 bg-gray-50" data-testid="partner-sig-metadata">
+              <p className="text-xs font-semibold text-iwhistle-blue mb-3 flex items-center gap-2">
+                <Shield className="w-3.5 h-3.5" /> Legal Compliance Record
+              </p>
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex items-start gap-2">
+                  <Clock className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">Signed at</p>
+                    <p className="text-xs font-semibold text-gray-800" data-testid="partner-sig-timestamp">
+                      {app.signature_metadata.signed_at
+                        ? new Date(app.signature_metadata.signed_at).toLocaleString()
+                        : '-'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <MapPin className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">IP Address</p>
+                    <p className="text-xs font-semibold text-gray-800 font-mono" data-testid="partner-sig-ip">
+                      {app.signature_metadata.ip_address || '-'}
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-2">
+                  <Monitor className="w-3.5 h-3.5 text-gray-400 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs text-gray-400">Device</p>
+                    <p className="text-xs text-gray-700 truncate" data-testid="partner-sig-useragent"
+                       title={app.signature_metadata.user_agent}>
+                      {app.signature_metadata.user_agent
+                        ? app.signature_metadata.user_agent.split(' ').slice(0, 3).join(' ') + '...'
+                        : '-'}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
