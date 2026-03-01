@@ -211,7 +211,6 @@ export function AdminDashboard() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
   const { token, logout } = useAuth();
-  const navigate = useNavigate();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
