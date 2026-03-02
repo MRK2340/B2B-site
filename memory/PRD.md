@@ -99,6 +99,18 @@ User requested to recreate a B2B site from a GitHub repository (MRK2340/B2B-site
   - Displayed in application detail modal
 - [x] **Mobile Dashboard**: Bottom navigation bar for mobile + slide-out sidebar
 - [x] **Backend**: GET /api/partnerships now returns `id` field + signature field in PartnershipFormData
+
+### Phase 6 - Signed Certificate PDF (Feb 2026)
+- [x] **PDF Certificate Generator**: `src/utils/generateSignedPDF.js` using jsPDF
+  - Branded header with iWhistle logo, navy background, orange accent stripe
+  - Unique Certificate ID (CERT-{8 chars})
+  - Status badge (Approved/Rejected/Pending)
+  - All partnership details (org, contact, program, pricing, signatory)
+  - Embedded drawn signature image
+  - Legal Compliance Record box (signed_at, IP, device)
+  - Multi-page support with compliance footer on every page
+- [x] "Download Signed Certificate PDF" button in Admin Dashboard partnership modal
+- [x] "Download Signed Certificate PDF" button in Partner Dashboard application detail modal
 - Phase 1: 100% passed
 - Phase 2: 100% passed
 - Phase 3: 100% passed

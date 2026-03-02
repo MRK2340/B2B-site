@@ -7,6 +7,7 @@ import {
   LogOut, Shield, Monitor, MapPin
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { generateSignedPDF } from '../utils/generateSignedPDF';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -179,6 +180,20 @@ function PartnershipDetailModal({ partnership, onClose, onStatusChange }) {
                   </div>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* PDF Certificate Download */}
+          {(partnership.signature || partnership.signature_metadata) && (
+            <div className="border-t border-gray-100 pt-4">
+              <button
+                onClick={() => generateSignedPDF(partnership)}
+                data-testid="download-signed-pdf-btn"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              >
+                <Download className="w-5 h-5" />
+                Download Signed Certificate PDF
+              </button>
             </div>
           )}
         </div>

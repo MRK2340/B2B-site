@@ -11,6 +11,7 @@ import { PartnershipForm } from '../sections/PartnershipForm';
 import { DocumentViewer } from '../components/DocumentViewer';
 import { documentContent } from '../data/documentContent';
 import { jsPDF } from 'jspdf';
+import { generateSignedPDF } from '../utils/generateSignedPDF';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -177,13 +178,25 @@ function AppDetailModal({ app, onClose }) {
               </div>
             </div>
           )}
+
+          {/* PDF Certificate Download */}
+          {(app.signature || app.signature_metadata) && (
+            <div className="border-t border-gray-100 pt-4">
+              <button
+                onClick={() => generateSignedPDF(app)}
+                data-testid="partner-download-signed-pdf-btn"
+                className="w-full flex items-center justify-center gap-2 py-3 px-4 gradient-primary text-white rounded-xl font-semibold hover:opacity-90 transition-opacity"
+              >
+                <Download className="w-5 h-5" />
+                Download Signed Certificate PDF
+              </button>
+            </div>
+          )}
         </div>
       </motion.div>
     </motion.div>
   );
 }
-
-// ─── Overview Tab ─────────────────────────────────────────────────────────────
 function OverviewTab({ user, stats, applications, setActiveTab }) {
   const latestApp = applications[0];
   const greeting = () => {
