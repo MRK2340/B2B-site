@@ -4,10 +4,13 @@ import {
   LayoutDashboard, FileCheck2, BookOpen, PenLine, LogOut,
   ChevronRight, Clock, CheckCircle, XCircle, Eye, Download,
   RefreshCw, Users, Building2, X, Menu, Loader2, FileText,
-  Shield, Scale, Lock, MapPin, Monitor
+  Shield, Scale, Lock, MapPin, Monitor, BarChart3
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { PartnershipForm } from '../sections/PartnershipForm';
+import { PartnershipOverview } from '../sections/PartnershipOverview';
+import { PilotProgram } from '../sections/PilotProgram';
+import { SuccessMetrics } from '../sections/SuccessMetrics';
 import { DocumentViewer } from '../components/DocumentViewer';
 import { documentContent } from '../data/documentContent';
 import { jsPDF } from 'jspdf';
@@ -18,6 +21,7 @@ const API_URL = process.env.REACT_APP_BACKEND_URL;
 const navItems = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
   { id: 'applications', label: 'My Applications', icon: FileCheck2 },
+  { id: 'program', label: 'Program Details', icon: BarChart3 },
   { id: 'documents', label: 'Documents', icon: BookOpen },
   { id: 'apply', label: 'Apply Now', icon: PenLine },
 ];
@@ -197,6 +201,57 @@ function AppDetailModal({ app, onClose }) {
     </motion.div>
   );
 }
+
+// ─── Program Details Tab ──────────────────────────────────────────────────────
+function ProgramDetailsTab({ setActiveTab }) {
+  return (
+    <div data-testid="program-tab">
+      {/* Header with Apply CTA */}
+      <div className="px-6 lg:px-8 py-5 bg-white border-b border-gray-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h2 className="text-xl font-bold text-iwhistle-deep">Program Details</h2>
+          <p className="text-sm text-gray-500 mt-0.5">
+            Everything you need to know before submitting your partnership application
+          </p>
+        </div>
+        <motion.button
+          onClick={() => setActiveTab('apply')}
+          whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.97 }}
+          data-testid="program-apply-cta"
+          className="inline-flex items-center gap-2 px-6 py-2.5 gradient-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity whitespace-nowrap flex-shrink-0"
+        >
+          <PenLine className="w-4 h-4" />
+          Apply Now
+        </motion.button>
+      </div>
+
+      {/* Partnership Overview — 6 feature cards */}
+      <PartnershipOverview />
+
+      {/* Pilot Program — Track A/B cards + investment table */}
+      <PilotProgram />
+
+      {/* Success Metrics — animated counters + reporting info */}
+      <SuccessMetrics />
+
+      {/* Bottom Apply CTA */}
+      <div className="px-6 lg:px-8 py-12 bg-white flex flex-col items-center gap-4 text-center">
+        <p className="text-gray-500 text-sm max-w-md">
+          Ready to bring iWhistle to your organization? Submit your partnership application and our team will be in touch within 48 hours.
+        </p>
+        <button
+          onClick={() => setActiveTab('apply')}
+          data-testid="program-bottom-apply-cta"
+          className="inline-flex items-center gap-2 px-8 py-3 gradient-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity"
+        >
+          <PenLine className="w-5 h-5" />
+          Start Your Application
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function OverviewTab({ user, stats, applications, setActiveTab }) {
   const latestApp = applications[0];
   const greeting = () => {
@@ -254,9 +309,10 @@ function OverviewTab({ user, stats, applications, setActiveTab }) {
       {/* Quick Actions */}
       <div>
         <h2 className="text-base font-semibold text-gray-700 mb-4">Quick Actions</h2>
-        <div className="grid sm:grid-cols-3 gap-4">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {[
             { icon: PenLine, label: 'Start New Application', desc: 'Submit a partnership application', tab: 'apply', bg: 'gradient-primary', text: 'text-white' },
+            { icon: BarChart3, label: 'View Program Details', desc: 'Pricing, pilot structure & metrics', tab: 'program', bg: 'bg-white border border-gray-200', text: 'text-iwhistle-deep' },
             { icon: BookOpen, label: 'Review Documents', desc: 'Access all partnership documents', tab: 'documents', bg: 'bg-white border border-gray-200', text: 'text-iwhistle-deep' },
             { icon: FileCheck2, label: 'Track Applications', desc: 'View status of your submissions', tab: 'applications', bg: 'bg-white border border-gray-200', text: 'text-iwhistle-deep' },
           ].map((action) => (
@@ -588,6 +644,7 @@ export default function PartnerDashboard() {
               {activeTab === 'applications' && (
                 <ApplicationsTab applications={applications} loading={loadingApps} onRefresh={fetchApplications} setActiveTab={setActiveTab} />
               )}
+              {activeTab === 'program' && <ProgramDetailsTab setActiveTab={setActiveTab} />}
               {activeTab === 'documents' && <DocumentsTab />}
               {activeTab === 'apply' && (
                 <div data-testid="apply-tab">
@@ -600,19 +657,22 @@ export default function PartnerDashboard() {
 
         {/* Mobile bottom nav */}
         <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 flex">
-          {navItems.map((item) => (
-            <button key={item.id} onClick={() => setActiveTab(item.id)}
-              data-testid={`mobile-nav-${item.id}`}
-              className={`flex-1 flex flex-col items-center justify-center py-2.5 text-xs font-medium transition-colors relative ${
-                activeTab === item.id ? 'text-iwhistle-blue' : 'text-gray-400'
-              }`}>
-              <item.icon className="w-5 h-5 mb-0.5" />
-              {item.label === 'My Applications' ? 'Applications' : item.label}
-              {item.id === 'applications' && stats.pending > 0 && (
-                <span className="absolute top-1.5 right-1/4 w-2 h-2 bg-amber-400 rounded-full" />
-              )}
-            </button>
-          ))}
+          {navItems.map((item) => {
+            const mobileLabel = item.id === 'applications' ? 'Apps' : item.id === 'program' ? 'Program' : item.label === 'Apply Now' ? 'Apply' : item.label;
+            return (
+              <button key={item.id} onClick={() => setActiveTab(item.id)}
+                data-testid={`mobile-nav-${item.id}`}
+                className={`flex-1 flex flex-col items-center justify-center py-2 text-xs font-medium transition-colors relative ${
+                  activeTab === item.id ? 'text-iwhistle-blue' : 'text-gray-400'
+                }`}>
+                <item.icon className="w-4 h-4 mb-0.5" />
+                {mobileLabel}
+                {item.id === 'applications' && stats.pending > 0 && (
+                  <span className="absolute top-1.5 right-1/4 w-2 h-2 bg-amber-400 rounded-full" />
+                )}
+              </button>
+            );
+          })}
         </nav>
       </div>
     </div>
