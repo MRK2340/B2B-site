@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Users, DollarSign, Clock, CheckCircle, XCircle,
   Trash2, Eye, RefreshCw, Search, Filter, ChevronDown, Download,
-  LogOut, Shield, Monitor, MapPin
+  LogOut, Shield, Monitor, MapPin, Bell, MessageSquare, Moon, Sun
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { generateSignedPDF } from '../utils/generateSignedPDF';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -22,7 +23,7 @@ function StatCard({ icon: Icon, label, value, color }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl border border-gray-100 shadow-card p-6"
+      className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 shadow-card p-6"
       data-testid={`stat-${label.toLowerCase().replace(/\s+/g, '-')}`}
     >
       <div className="flex items-center gap-4">
@@ -30,8 +31,8 @@ function StatCard({ icon: Icon, label, value, color }) {
           <Icon className="w-6 h-6 text-white" />
         </div>
         <div>
-          <p className="text-sm text-gray-500">{label}</p>
-          <p className="text-2xl font-bold text-iwhistle-deep">{value}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">{label}</p>
+          <p className="text-2xl font-bold text-iwhistle-deep dark:text-white">{value}</p>
         </div>
       </div>
     </motion.div>
@@ -224,7 +225,12 @@ export default function AdminDashboard() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [newCount, setNewCount] = useState(0);
+  const [inquiries, setInquiries] = useState([]);
+  const [showInquiries, setShowInquiries] = useState(false);
+  const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const { token, logout } = useAuth();
+  const { isDark, toggle: toggleTheme } = useTheme();
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -245,7 +251,50 @@ export default function AdminDashboard() {
     }
   }, [token]);
 
+  const fetchInquiries = useCallback(async () => {
+    setInquiriesLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/contact`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setInquiries(data.inquiries || []);
+    } catch (err) {
+      console.error('Failed to fetch inquiries:', err);
+    } finally {
+      setInquiriesLoading(false);
+    }
+  }, [token]);
+
+  const markInquiryRead = async (id) => {
+    try {
+      await fetch(`${API_URL}/api/admin/contact/${id}/read`, {
+        method: 'PUT',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setInquiries((prev) => prev.map((i) => i.id === id ? { ...i, status: 'read' } : i));
+    } catch (err) {
+      console.error('Failed to mark inquiry read:', err);
+    }
+  };
+
   useEffect(() => { fetchData(); }, [fetchData]);
+
+  // Notification badge — count new partnerships since last admin visit
+  useEffect(() => {
+    if (partnerships.length > 0) {
+      const lastSeen = localStorage.getItem('admin_last_seen');
+      if (lastSeen) {
+        const count = partnerships.filter((p) => new Date(p.created_at) > new Date(lastSeen)).length;
+        setNewCount(count);
+      }
+      const timer = setTimeout(() => {
+        localStorage.setItem('admin_last_seen', new Date().toISOString());
+        setNewCount(0);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [partnerships]);
 
   const handleStatusChange = async (id, status) => {
     try {
@@ -314,8 +363,8 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50" data-testid="admin-dashboard">
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
+    <div className="min-h-screen bg-gray-50 dark:bg-slate-900" data-testid="admin-dashboard">
+      <header className="bg-white dark:bg-slate-800 border-b border-gray-200 dark:border-slate-700 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -323,19 +372,36 @@ export default function AdminDashboard() {
                 <ArrowLeft className="w-5 h-5" />
                 <span className="hidden sm:inline text-sm">Back to Portal</span>
               </Link>
-              <div className="h-6 w-px bg-gray-200" />
+              <div className="h-6 w-px bg-gray-200 dark:bg-slate-600" />
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
                   <span className="text-white font-bold text-sm">i</span>
                 </div>
-                <h1 className="text-lg font-bold text-iwhistle-deep">Admin Dashboard</h1>
+                <h1 className="text-lg font-bold text-iwhistle-deep dark:text-white">Admin Dashboard</h1>
               </div>
+              {newCount > 0 && (
+                <div
+                  data-testid="new-applications-badge"
+                  className="flex items-center gap-1.5 px-3 py-1 bg-amber-50 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-full text-xs font-medium text-amber-700 dark:text-amber-400"
+                >
+                  <Bell className="w-3.5 h-3.5" />
+                  {newCount} new application{newCount !== 1 ? 's' : ''}
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-2">
               <button onClick={handleExportCSV} disabled={loading || partnerships.length === 0} data-testid="export-csv-btn"
                 className="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-iwhistle-blue bg-iwhistle-blue/10 rounded-lg hover:bg-iwhistle-blue/20 transition-colors disabled:opacity-50">
                 <Download className="w-4 h-4" />
                 Export CSV
+              </button>
+              <button
+                onClick={toggleTheme}
+                data-testid="admin-theme-toggle"
+                aria-label="Toggle dark mode"
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 rounded-lg hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
               <button onClick={fetchData} disabled={loading} data-testid="refresh-btn"
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">
@@ -369,14 +435,14 @@ export default function AdminDashboard() {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               data-testid="admin-search-input"
-              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-gray-100 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
             />
           </div>
           <div className="relative">
             <button
               onClick={() => setShowFilterMenu(!showFilterMenu)}
               data-testid="filter-btn"
-              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 bg-white text-sm font-medium text-gray-600 hover:bg-gray-50 transition-colors"
+              className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
             >
               <Filter className="w-4 h-4" />
               {statusFilter === 'all' ? 'All Status' : statusConfig[statusFilter]?.label}
@@ -399,7 +465,7 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20" data-testid="admin-loading">
               <div className="w-8 h-8 border-4 border-iwhistle-blue/20 border-t-iwhistle-blue rounded-full animate-spin" />
@@ -416,7 +482,7 @@ export default function AdminDashboard() {
             <div className="overflow-x-auto">
               <table className="w-full" data-testid="admin-partnerships-table">
                 <thead>
-                  <tr className="bg-gray-50 border-b border-gray-200">
+                  <tr className="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Organization</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
                     <th className="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Officials</th>
@@ -435,7 +501,7 @@ export default function AdminDashboard() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: idx * 0.03 }}
-                        className="hover:bg-gray-50/50 transition-colors"
+                        className="hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors"
                         data-testid={`partnership-row-${idx}`}
                       >
                         <td className="px-6 py-4">
@@ -477,9 +543,85 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        <p className="text-center text-sm text-gray-400 mt-6">
+        <p className="text-center text-sm text-gray-400 dark:text-gray-500 mt-6">
           Showing {filtered.length} of {partnerships.length} applications
         </p>
+
+        {/* Partner Inquiries Section */}
+        <div className="mt-6">
+          <button
+            onClick={() => { setShowInquiries(!showInquiries); if (!showInquiries && inquiries.length === 0) fetchInquiries(); }}
+            data-testid="toggle-inquiries-btn"
+            className="flex items-center gap-3 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+          >
+            <MessageSquare className="w-5 h-5 text-iwhistle-blue" />
+            <span className="font-semibold text-iwhistle-deep dark:text-white text-sm">Partner Inquiries</span>
+            {inquiries.filter((i) => i.status === 'unread').length > 0 && (
+              <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-xs font-medium px-2 py-0.5 rounded-full">
+                {inquiries.filter((i) => i.status === 'unread').length} unread
+              </span>
+            )}
+            <ChevronDown className={`w-4 h-4 text-gray-400 ml-auto transition-transform duration-200 ${showInquiries ? 'rotate-180' : ''}`} />
+          </button>
+          <AnimatePresence>
+            {showInquiries && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-2 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                  {inquiriesLoading ? (
+                    <div className="flex items-center justify-center py-10" data-testid="inquiries-loading">
+                      <div className="w-6 h-6 border-3 border-iwhistle-blue/20 border-t-iwhistle-blue rounded-full animate-spin" />
+                    </div>
+                  ) : inquiries.length === 0 ? (
+                    <div className="text-center py-10" data-testid="no-inquiries">
+                      <MessageSquare className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">No inquiries yet</p>
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-100 dark:divide-slate-700">
+                      {inquiries.map((inq, idx) => (
+                        <div
+                          key={inq.id || idx}
+                          data-testid={`inquiry-row-${idx}`}
+                          className={`p-4 flex items-start gap-4 transition-colors ${
+                            inq.status === 'unread'
+                              ? 'bg-amber-50/50 dark:bg-amber-900/10'
+                              : 'hover:bg-gray-50 dark:hover:bg-slate-700/30'
+                          }`}
+                        >
+                          <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${inq.status === 'unread' ? 'bg-amber-400' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-sm font-semibold text-iwhistle-deep dark:text-white">{inq.subject}</span>
+                              <span className="text-xs px-2 py-0.5 rounded-full bg-iwhistle-blue/10 text-iwhistle-blue capitalize">{inq.category}</span>
+                            </div>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{inq.message}</p>
+                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                              From <span className="font-medium">{inq.user_name}</span> ({inq.organization}) · {inq.created_at ? new Date(inq.created_at).toLocaleDateString() : ''}
+                            </p>
+                          </div>
+                          {inq.status === 'unread' && (
+                            <button
+                              onClick={() => markInquiryRead(inq.id)}
+                              data-testid={`mark-read-btn-${idx}`}
+                              className="flex-shrink-0 text-xs text-iwhistle-blue hover:underline font-medium"
+                            >
+                              Mark read
+                            </button>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </main>
 
       <AnimatePresence>

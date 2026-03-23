@@ -68,3 +68,22 @@ def admin_stats(user: dict = Depends(require_admin)):
         "total_value": round(total_value, 2),
         "total_officials": total_officials,
     }
+
+
+@router.get("/contact")
+def admin_get_contact(user: dict = Depends(require_admin)):
+    inquiries = []
+    for doc in db.contact_inquiries.find({}).sort("created_at", -1):
+        doc["id"] = str(doc["_id"])
+        del doc["_id"]
+        inquiries.append(doc)
+    return {"inquiries": inquiries}
+
+
+@router.put("/contact/{inquiry_id}/read")
+def mark_contact_read(inquiry_id: str, user: dict = Depends(require_admin)):
+    db.contact_inquiries.update_one(
+        {"_id": ObjectId(inquiry_id)},
+        {"$set": {"status": "read"}},
+    )
+    return {"status": "success"}

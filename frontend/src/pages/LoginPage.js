@@ -74,7 +74,7 @@ export default function LoginPage() {
       </div>
 
       {/* Right panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-gray-50 dark:bg-slate-900">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -86,13 +86,13 @@ export default function LoginPage() {
             <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
               <span className="text-white font-bold">i</span>
             </div>
-            <span className="font-bold text-xl text-iwhistle-deep">Whistle</span>
+            <span className="font-bold text-xl text-iwhistle-deep dark:text-white">Whistle</span>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-8">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-iwhistle-deep mb-2" data-testid="login-title">Sign in to your account</h1>
-              <p className="text-gray-500 text-sm">Enter your credentials to access the partner portal</p>
+              <h1 className="text-2xl font-bold text-iwhistle-deep dark:text-white mb-2" data-testid="login-title">Sign in to your account</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Enter your credentials to access the partner portal</p>
             </div>
 
             {error && (
@@ -109,7 +109,7 @@ export default function LoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Email Address
                 </label>
                 <input
@@ -120,12 +120,12 @@ export default function LoginPage() {
                   required
                   data-testid="login-email-input"
                   placeholder="you@organization.com"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                   Password
                 </label>
                 <div className="relative">
@@ -137,12 +137,12 @@ export default function LoginPage() {
                     required
                     data-testid="login-password-input"
                     placeholder="••••••••"
-                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                     data-testid="toggle-password-visibility"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -168,7 +168,7 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Don't have an account?{' '}
                 <Link to="/register" data-testid="go-to-register-link" className="text-iwhistle-blue font-medium hover:text-iwhistle-deep transition-colors">
                   Register as a partner

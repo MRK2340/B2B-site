@@ -30,6 +30,20 @@
     --iwhistle-light: #4DB8E8;
     --iwhistle-burnt: #E67300;
   }
+
+  .dark {
+    --background: 222 47% 9%;
+    --foreground: 210 40% 98%;
+    --card: 222 47% 12%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222 47% 12%;
+    --popover-foreground: 210 40% 98%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 200 100% 39%;
+  }
 }
 
 @layer base {

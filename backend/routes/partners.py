@@ -8,7 +8,7 @@ from reportlab.lib.colors import HexColor
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
-from models import PartnershipFormData
+from models import PartnershipFormData, ContactInquiry
 from database import db
 from utils.auth import get_current_user
 from utils.email import send_new_application_email
@@ -52,6 +52,22 @@ def get_partnerships(user: dict = Depends(get_current_user)):
         del doc["_id"]
         partnerships.append(doc)
     return {"partnerships": partnerships}
+
+
+@router.post("/api/contact")
+def submit_contact(inquiry: ContactInquiry, user: dict = Depends(get_current_user)):
+    data = {
+        "user_email": user["email"],
+        "user_name": user.get("name", ""),
+        "organization": user.get("organization", ""),
+        "category": inquiry.category,
+        "subject": inquiry.subject,
+        "message": inquiry.message,
+        "created_at": datetime.now(timezone.utc).isoformat(),
+        "status": "unread",
+    }
+    result = db.contact_inquiries.insert_one(data)
+    return {"status": "success", "id": str(result.inserted_id)}
 
 
 @router.post("/api/partnerships/{partnership_id}/pdf")

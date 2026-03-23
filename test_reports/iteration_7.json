@@ -1,0 +1,54 @@
+{
+  "summary": "Testing 3 new features: Dark Mode Toggle, Contact Us Tab, and Admin Notification Badge. Backend: 13/13 tests passed (100%). Frontend: all critical flows tested and passing. One structural issue found: Navbar.js component with data-testid=theme-toggle-btn is NOT imported/used anywhere in the app - it's a dead file. Theme toggle is only functional in PartnerDashboard (/portal) and AdminDashboard (/admin), not on the public homepage.",
+  "backend_issues": {
+    "critical": [],
+    "minor": []
+  },
+  "frontend_issues": {
+    "ui_bugs": [
+      {
+        "component": "Navbar.js (sections/Navbar.js)",
+        "issue": "Navbar.js component with data-testid='theme-toggle-btn' is NOT imported or used anywhere in the app. HomePage.js has its own inline nav without a theme toggle. This means the public homepage has no dark mode toggle.",
+        "selector": "[data-testid='theme-toggle-btn']",
+        "priority": "MEDIUM"
+      }
+    ],
+    "integration_issues": [],
+    "design_issues": [
+      {
+        "screen": "PartnerDashboard - Contact Us tab",
+        "issues": ["Minor: Contact tab shows the theme toggle icon (moon) in header which is slightly misaligned with user info text - visual only, not functional"]
+      }
+    ]
+  },
+  "test_report_links": [
+    "/app/backend/tests/test_new_features.py",
+    "/app/test_reports/pytest/new_features_results.xml"
+  ],
+  "action_items": [
+    "Fix: Navbar.js (sections/Navbar.js) is not imported anywhere - either import it in HomePage.js to replace the inline nav, or add theme toggle to the inline nav in HomePage.js so users can toggle dark mode from the homepage. The data-testid='theme-toggle-btn' is currently unreachable."
+  ],
+  "critical_code_review_comments": [
+    "Navbar.js in /frontend/src/sections/Navbar.js is a dead file - not imported by any page. The HomePage.js has its own inline nav. The dark mode toggle button with data-testid='theme-toggle-btn' is not accessible to any user.",
+    "AdminDashboard.js is 639 lines - approaching the 700 line limit mentioned in code review guidelines",
+    "PartnerDashboard.js is 838 lines - exceeds 700 line limit, should be split into smaller components (already partially done with function components inside the file)",
+    "Admin notification badge logic: badge only shows when admin_last_seen IS SET and there are newer partnerships. On first visit (no admin_last_seen), the badge never shows even with new apps. This may be by design but could be confusing UX.",
+    "ContactTab component properly handles error states and loading states - good implementation"
+  ],
+  "updated_files": [
+    "/app/backend/tests/test_new_features.py"
+  ],
+  "success_rate": {
+    "backend": "100% (13/13 tests passed)",
+    "frontend": "92% - all new features functional, 1 structural issue with Navbar.js not being used"
+  },
+  "test_credentials": {
+    "admin": "admin@i-whistle.com / admin123",
+    "partner": "test@test.com / partner123"
+  },
+  "seed_data_creation": "Created 7 test contact inquiries via POST /api/contact during backend and UI testing",
+  "retest_needed": false,
+  "main_agent_can_self_test": true,
+  "context_for_next_testing_agent": "All 3 new features are working: 1) Dark Mode - works in PartnerDashboard and AdminDashboard, persists in localStorage key 'iwhistle-theme', applies 'dark' class to html element. 2) Contact Us - tab in partner sidebar, form submits to POST /api/contact, success state shown. 3) Admin Notification Badge - shows count when admin_last_seen localStorage key is set and there are newer partnerships, auto-clears after 3s. KEY BUG: sections/Navbar.js (with theme-toggle-btn) is not imported anywhere - dead file. Homepage has no dark mode toggle. All existing features (admin/partner login, dashboard, application submission) confirmed working.",
+  "rca_of_issue": "Navbar.js dead file: The app was refactored to use a new HomePage.js with its own inline nav component, but the original Navbar.js section (with the dark mode toggle) was left as a dead file. The ThemeProvider was added to App.js but the homepage nav was not updated to use the Navbar.js component or add its own theme toggle. Fix: Either import Navbar.js in HomePage.js or add a theme toggle button to the inline nav in HomePage.js."
+}

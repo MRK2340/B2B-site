@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Menu, LogOut, User, ShieldCheck } from 'lucide-react';
+import { Menu, LogOut, User, ShieldCheck, Moon, Sun } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useScrollPosition } from '../hooks/useScrollPosition';
 import { Sheet, SheetTrigger, SheetContent } from '../components/ui/sheet';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const navLinks = [
   { label: 'Partnership', href: '#partnership' },
@@ -18,12 +19,31 @@ export function Navbar() {
   const { isScrolled } = useScrollPosition();
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { isDark, toggle: toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     window.location.href = '/';
   };
+
+  const ThemeToggle = ({ compact = false }) => (
+    <button
+      onClick={toggleTheme}
+      data-testid="theme-toggle-btn"
+      aria-label="Toggle dark mode"
+      className={`flex items-center gap-1.5 rounded-lg transition-all ${
+        compact
+          ? 'p-2 text-gray-500 hover:text-iwhistle-blue hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-slate-700'
+          : isScrolled
+          ? 'px-3 py-1.5 text-gray-500 hover:text-iwhistle-blue hover:bg-gray-100'
+          : 'px-3 py-1.5 text-white/80 hover:text-white hover:bg-white/10'
+      }`}
+    >
+      {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+      {!compact && <span className="text-sm font-medium hidden sm:inline">{isDark ? 'Light' : 'Dark'}</span>}
+    </button>
+  );
 
   return (
     <motion.header
@@ -65,6 +85,7 @@ export function Navbar() {
 
           {/* Auth section */}
           <div className="hidden md:flex items-center gap-3">
+            <ThemeToggle />
             {user && (
               <div className="flex items-center gap-3">
                 <div className={`flex items-center gap-2 text-sm ${isScrolled ? 'text-iwhistle-deep' : 'text-white/90'}`} data-testid="navbar-user-info">
@@ -112,22 +133,26 @@ export function Navbar() {
                 <Menu className="w-6 h-6" />
               </button>
             </SheetTrigger>
-            <SheetContent side="right" className="w-[280px] bg-white">
+            <SheetContent side="right" className="w-[280px] bg-white dark:bg-slate-800">
               <div className="flex flex-col gap-6 mt-8">
                 {navLinks.map((link) => (
                   <a
                     key={link.href}
                     href={link.href}
                     onClick={() => setIsOpen(false)}
-                    className="text-lg font-medium text-iwhistle-deep hover:text-iwhistle-blue transition-colors"
+                    className="text-lg font-medium text-iwhistle-deep dark:text-white hover:text-iwhistle-blue transition-colors"
                   >
                     {link.label}
                   </a>
                 ))}
-                {user && (
-                  <>
-                    <div className="border-t border-gray-100 pt-4">
-                      <p className="text-sm text-gray-500 mb-3">Signed in as <span className="font-medium text-iwhistle-deep">{user.name}</span></p>
+                <div className="border-t border-gray-100 dark:border-slate-700 pt-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Theme</span>
+                    <ThemeToggle compact />
+                  </div>
+                  {user && (
+                    <>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">Signed in as <span className="font-medium text-iwhistle-deep dark:text-white">{user.name}</span></p>
                       {user.role === 'admin' && (
                         <Link to="/admin" onClick={() => setIsOpen(false)} className="flex items-center gap-2 text-iwhistle-blue font-medium mb-3">
                           <ShieldCheck className="w-4 h-4" />
@@ -138,9 +163,9 @@ export function Navbar() {
                         <LogOut className="w-4 h-4" />
                         Logout
                       </button>
-                    </div>
-                  </>
-                )}
+                    </>
+                  )}
+                </div>
               </div>
             </SheetContent>
           </Sheet>

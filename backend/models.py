@@ -44,3 +44,9 @@ class PartnershipFormData(BaseModel):
 
 class PartnershipStatusUpdate(BaseModel):
     status: str
+
+
+class ContactInquiry(BaseModel):
+    category: Optional[str] = "general"
+    subject: str
+    message: str

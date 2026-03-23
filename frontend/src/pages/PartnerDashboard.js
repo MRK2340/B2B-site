@@ -4,9 +4,10 @@ import {
   LayoutDashboard, FileCheck2, BookOpen, PenLine, LogOut,
   ChevronRight, Clock, CheckCircle, XCircle, Eye, Download,
   RefreshCw, Users, Building2, X, Menu, Loader2, FileText,
-  Shield, Scale, Lock, MapPin, Monitor, BarChart3
+  Shield, Scale, Lock, MapPin, Monitor, BarChart3, MessageSquare, Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { PartnershipForm } from '../sections/PartnershipForm';
 import { PartnershipOverview } from '../sections/PartnershipOverview';
 import { PilotProgram } from '../sections/PilotProgram';
@@ -24,6 +25,7 @@ const navItems = [
   { id: 'program', label: 'Program Details', icon: BarChart3 },
   { id: 'documents', label: 'Documents', icon: BookOpen },
   { id: 'apply', label: 'Apply Now', icon: PenLine },
+  { id: 'contact', label: 'Contact Us', icon: MessageSquare },
 ];
 
 const statusConfig = {
@@ -476,6 +478,146 @@ function DocumentsTab() {
   );
 }
 
+// ─── Contact Us Tab ───────────────────────────────────────────────────────────
+function ContactTab({ token }) {
+  const [form, setForm] = useState({ category: 'general', subject: '', message: '' });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const categories = [
+    { value: 'general', label: 'General Inquiry' },
+    { value: 'billing', label: 'Billing & Pricing' },
+    { value: 'technical', label: 'Technical Support' },
+    { value: 'partnership', label: 'Partnership Question' },
+    { value: 'other', label: 'Other' },
+  ];
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSubmitting(true);
+    setError('');
+    try {
+      const res = await fetch(`${API_URL}/api/contact`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(form),
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        setSubmitted(true);
+      } else {
+        setError('Failed to send message. Please try again.');
+      }
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  if (submitted) {
+    return (
+      <div className="p-6 lg:p-8 flex items-center justify-center min-h-96" data-testid="contact-success">
+        <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-sm">
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+            <CheckCircle className="w-8 h-8 text-green-500" />
+          </div>
+          <h3 className="text-xl font-bold text-iwhistle-deep dark:text-white mb-2">Message Sent!</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
+            Our team will get back to you within 48 hours.
+          </p>
+          <button
+            onClick={() => { setSubmitted(false); setForm({ category: 'general', subject: '', message: '' }); }}
+            data-testid="contact-send-another-btn"
+            className="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
+          >
+            Send Another Message
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 lg:p-8" data-testid="contact-tab">
+      <div className="mb-6">
+        <h2 className="text-xl font-bold text-iwhistle-deep dark:text-white">Contact Us</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+          Have a question or need support? Send us a message and we'll respond within 48 hours.
+        </p>
+      </div>
+      <div className="max-w-2xl">
+        <div className="grid sm:grid-cols-3 gap-4 mb-8">
+          {[
+            { icon: MessageSquare, title: 'General Support', desc: 'Questions about your account or portal' },
+            { icon: FileText, title: 'Billing & Pricing', desc: 'Rate and contract inquiries' },
+            { icon: Shield, title: 'Technical Help', desc: 'Issues with the platform' },
+          ].map((item, i) => (
+            <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 p-4 text-center">
+              <div className="w-10 h-10 rounded-lg bg-iwhistle-blue/10 flex items-center justify-center mx-auto mb-3">
+                <item.icon className="w-5 h-5 text-iwhistle-blue" />
+              </div>
+              <p className="text-sm font-semibold text-iwhistle-deep dark:text-white">{item.title}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{item.desc}</p>
+            </div>
+          ))}
+        </div>
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6 lg:p-8 space-y-5"
+        >
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              data-testid="contact-category-select"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none text-sm transition-all"
+            >
+              {categories.map((c) => <option key={c.value} value={c.value}>{c.label}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+            <input
+              type="text" required value={form.subject}
+              onChange={(e) => setForm({ ...form, subject: e.target.value })}
+              placeholder="Brief description of your inquiry"
+              data-testid="contact-subject-input"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none text-sm transition-all"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+            <textarea
+              required value={form.message}
+              onChange={(e) => setForm({ ...form, message: e.target.value })}
+              placeholder="Provide details about your question or issue..."
+              rows={5}
+              data-testid="contact-message-input"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none text-sm transition-all resize-none"
+            />
+          </div>
+          {error && <p className="text-red-500 text-sm" data-testid="contact-error">{error}</p>}
+          <button
+            type="submit" disabled={submitting}
+            data-testid="contact-submit-btn"
+            className="w-full flex items-center justify-center gap-2 py-3 gradient-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
+          >
+            {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
+            {submitting ? 'Sending...' : 'Send Message'}
+          </button>
+        </form>
+        <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 text-center">
+          For urgent matters, email us at{' '}
+          <a href="mailto:support@i-whistle.com" className="text-iwhistle-blue hover:underline">support@i-whistle.com</a>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ─── Main Partner Dashboard ───────────────────────────────────────────────────
 export default function PartnerDashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -483,6 +625,7 @@ export default function PartnerDashboard() {
   const [loadingApps, setLoadingApps] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { user, token, logout } = useAuth();
+  const { isDark, toggle: toggleTheme } = useTheme();
 
   const fetchApplications = useCallback(async () => {
     if (!token) return;
@@ -581,7 +724,7 @@ export default function PartnerDashboard() {
   );
 
   return (
-    <div className="min-h-screen flex bg-gray-50" data-testid="partner-dashboard">
+    <div className="min-h-screen flex bg-gray-50 dark:bg-slate-900" data-testid="partner-dashboard">
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex flex-col w-64 bg-iwhistle-deep fixed inset-y-0 left-0 z-40">
         <SidebarContent />
@@ -622,13 +765,25 @@ export default function PartnerDashboard() {
         </header>
 
         {/* Page header */}
-        <div className="hidden lg:flex items-center justify-between px-8 py-4 bg-white border-b border-gray-100">
+        <div className="hidden lg:flex items-center justify-between px-8 py-4 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
           <div>
-            <h1 className="text-lg font-bold text-iwhistle-deep">{navItems.find(n => n.id === activeTab)?.label}</h1>
+            <h1 className="text-lg font-bold text-iwhistle-deep dark:text-white">{navItems.find(n => n.id === activeTab)?.label}</h1>
           </div>
-          <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span className="font-medium text-iwhistle-deep">{user?.name}</span>
-            <span className="text-gray-300">|</span>
+          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+            <button
+              onClick={toggleTheme}
+              data-testid="dashboard-theme-toggle"
+              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 text-gray-500 dark:text-gray-400 transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {isDark ? (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+              ) : (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+              )}
+            </button>
+            <span className="font-medium text-iwhistle-deep dark:text-white">{user?.name}</span>
+            <span className="text-gray-300 dark:text-gray-600">|</span>
             <span>{user?.organization}</span>
           </div>
         </div>
@@ -651,19 +806,21 @@ export default function PartnerDashboard() {
                   <PartnershipForm onSubmitSuccess={fetchApplications} />
                 </div>
               )}
+              {activeTab === 'contact' && <ContactTab token={token} />}
             </motion.div>
           </AnimatePresence>
         </main>
 
         {/* Mobile bottom nav */}
-        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-30 flex">
+        <nav className="lg:hidden fixed bottom-0 left-0 right-0 bg-white dark:bg-slate-800 border-t border-gray-200 dark:border-slate-700 z-30 flex">
           {navItems.map((item) => {
-            const mobileLabel = item.id === 'applications' ? 'Apps' : item.id === 'program' ? 'Program' : item.label === 'Apply Now' ? 'Apply' : item.label;
+            const labelMap = { applications: 'Apps', program: 'Program', apply: 'Apply', contact: 'Contact', overview: 'Home', documents: 'Docs' };
+            const mobileLabel = labelMap[item.id] || item.label;
             return (
               <button key={item.id} onClick={() => setActiveTab(item.id)}
                 data-testid={`mobile-nav-${item.id}`}
                 className={`flex-1 flex flex-col items-center justify-center py-2 text-xs font-medium transition-colors relative ${
-                  activeTab === item.id ? 'text-iwhistle-blue' : 'text-gray-400'
+                  activeTab === item.id ? 'text-iwhistle-blue' : 'text-gray-400 dark:text-gray-500'
                 }`}>
                 <item.icon className="w-4 h-4 mb-0.5" />
                 {mobileLabel}

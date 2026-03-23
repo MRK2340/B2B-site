@@ -93,7 +93,7 @@ export default function RegisterPage() {
       </div>
 
       {/* Right panel */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-gray-50">
+      <div className="w-full lg:w-1/2 flex items-center justify-center px-6 py-12 bg-gray-50 dark:bg-slate-900">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -105,13 +105,13 @@ export default function RegisterPage() {
             <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
               <span className="text-white font-bold">i</span>
             </div>
-            <span className="font-bold text-xl text-iwhistle-deep">Whistle</span>
+            <span className="font-bold text-xl text-iwhistle-deep dark:text-white">Whistle</span>
           </div>
 
-          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-8">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-iwhistle-deep mb-2" data-testid="register-title">Create your partner account</h1>
-              <p className="text-gray-500 text-sm">Get access to the iWhistle Partnership Portal</p>
+              <h1 className="text-2xl font-bold text-iwhistle-deep dark:text-white mb-2" data-testid="register-title">Create your partner account</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">Get access to the iWhistle Partnership Portal</p>
             </div>
 
             {error && (
@@ -129,49 +129,49 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1.5">Full Name</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
                   <input
                     id="name" name="name" type="text"
                     value={form.name} onChange={handleChange} required
                     data-testid="register-name-input"
                     placeholder="John Smith"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
                   />
                 </div>
                 <div>
-                  <label htmlFor="organization" className="block text-sm font-medium text-gray-700 mb-1.5">Organization</label>
+                  <label htmlFor="organization" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Organization</label>
                   <input
                     id="organization" name="organization" type="text"
                     value={form.organization} onChange={handleChange} required
                     data-testid="register-org-input"
                     placeholder="Basketball Association"
-                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
                   />
                 </div>
               </div>
 
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">Email Address</label>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Email Address</label>
                 <input
                   id="email" name="email" type="email"
                   value={form.email} onChange={handleChange} required
                   data-testid="register-email-input"
                   placeholder="you@organization.com"
-                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+                  className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
                 />
               </div>
 
               <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Password</label>
                 <div className="relative">
                   <input
                     id="password" name="password" type={showPassword ? 'text' : 'password'}
                     value={form.password} onChange={handleChange} required
                     data-testid="register-password-input"
                     placeholder="At least 6 characters"
-                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
+                    className="w-full px-4 py-2.5 pr-10 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none transition-all text-sm"
                   />
-                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
@@ -194,16 +194,16 @@ export default function RegisterPage() {
               </div>
 
               <div>
-                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1.5">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Confirm Password</label>
                 <input
                   id="confirmPassword" name="confirmPassword" type={showPassword ? 'text' : 'password'}
                   value={form.confirmPassword} onChange={handleChange} required
                   data-testid="register-confirm-password-input"
                   placeholder="Re-enter your password"
-                  className={`w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm ${
+                  className={`w-full px-4 py-2.5 rounded-lg border outline-none transition-all text-sm dark:bg-slate-700 dark:text-gray-100 ${
                     form.confirmPassword && form.password !== form.confirmPassword
                       ? 'border-red-300 focus:border-red-400 focus:ring-2 focus:ring-red-100'
-                      : 'border-gray-200 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20'
+                      : 'border-gray-200 dark:border-slate-600 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20'
                   }`}
                 />
               </div>
@@ -226,7 +226,7 @@ export default function RegisterPage() {
             </form>
 
             <div className="mt-6 text-center">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Already have an account?{' '}
                 <Link to="/login" data-testid="go-to-login-link" className="text-iwhistle-blue font-medium hover:text-iwhistle-deep transition-colors">
                   Sign in
