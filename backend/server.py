@@ -141,6 +141,18 @@ def seed_admin():
 seed_admin()
 
 
+# ─── DB Indexes ───────────────────────────────────────────────────────────────
+
+def create_indexes():
+    db.users.create_index("email", unique=True, background=True)
+    db.partnerships.create_index("submitted_by", background=True)
+    db.partnerships.create_index("status", background=True)
+    db.partnerships.create_index("created_at", background=True)
+    db.partnerships.create_index([("submitted_by", 1), ("created_at", -1)], background=True)
+
+create_indexes()
+
+
 # ─── Email Helper ─────────────────────────────────────────────────────────────
 
 def send_new_application_email(data: dict):
@@ -252,13 +264,27 @@ def get_partnerships(user: dict = Depends(get_current_user)):
     return {"partnerships": partnerships}
 
 @app.get("/api/admin/partnerships")
-def admin_get_partnerships(user: dict = Depends(require_admin)):
+def admin_get_partnerships(
+    user: dict = Depends(require_admin),
+    page: int = 1,
+    per_page: int = 50,
+):
+    page = max(1, page)
+    per_page = max(1, min(per_page, 200))
+    skip = (page - 1) * per_page
+    total = db.partnerships.count_documents({})
     partnerships = []
-    for doc in db.partnerships.find({}).sort("created_at", -1):
+    for doc in db.partnerships.find({}).sort("created_at", -1).skip(skip).limit(per_page):
         doc["id"] = str(doc["_id"])
         del doc["_id"]
         partnerships.append(doc)
-    return {"partnerships": partnerships}
+    return {
+        "partnerships": partnerships,
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "pages": (total + per_page - 1) // per_page,
+    }
 
 @app.put("/api/admin/partnerships/{partnership_id}/status")
 def update_partnership_status(partnership_id: str, update: PartnershipStatusUpdate, user: dict = Depends(require_admin)):
