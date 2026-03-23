@@ -1,7 +1,3 @@
-// Re-export from pages for backward compatibility
-export { default as AdminDashboard } from '../pages/AdminDashboard';
-
-// Keep original imports below (unused — file is now a shim)
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link } from 'react-router-dom';
@@ -132,7 +128,6 @@ function PartnershipDetailModal({ partnership, onClose, onStatusChange }) {
             ]} />
           </div>
 
-          {/* Signature & Legal Compliance */}
           {(partnership.signature || partnership.signature_metadata) && (
             <div className="border border-gray-100 rounded-xl p-5 bg-gray-50/50" data-testid="signature-compliance-section">
               <h4 className="text-sm font-semibold text-iwhistle-blue mb-4 flex items-center gap-2">
@@ -187,7 +182,6 @@ function PartnershipDetailModal({ partnership, onClose, onStatusChange }) {
             </div>
           )}
 
-          {/* PDF Certificate Download */}
           {(partnership.signature || partnership.signature_metadata) && (
             <div className="border-t border-gray-100 pt-4">
               <button
@@ -222,7 +216,7 @@ function DetailSection({ title, items }) {
   );
 }
 
-export function AdminDashboard() {
+export default function AdminDashboard() {
   const [partnerships, setPartnerships] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, approved: 0, rejected: 0, total_value: 0, total_officials: 0 });
   const [loading, setLoading] = useState(true);
@@ -311,7 +305,7 @@ export function AdminDashboard() {
   };
 
   const filtered = partnerships.filter(p => {
-    const matchesSearch = !searchTerm || 
+    const matchesSearch = !searchTerm ||
       p.partnerOrgName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.contactName?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       p.contactEmail?.toLowerCase().includes(searchTerm.toLowerCase());
@@ -321,7 +315,6 @@ export function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50" data-testid="admin-dashboard">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
@@ -360,7 +353,6 @@ export function AdminDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Stats */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StatCard icon={Users} label="Total Applications" value={stats.total} color="gradient-primary" />
           <StatCard icon={Clock} label="Pending Review" value={stats.pending} color="bg-amber-500" />
@@ -368,7 +360,6 @@ export function AdminDashboard() {
           <StatCard icon={DollarSign} label="Total Value" value={`$${stats.total_value.toLocaleString()}`} color="bg-iwhistle-blue" />
         </div>
 
-        {/* Search & Filter */}
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -408,7 +399,6 @@ export function AdminDashboard() {
           </div>
         </div>
 
-        {/* Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
             <div className="flex items-center justify-center py-20" data-testid="admin-loading">

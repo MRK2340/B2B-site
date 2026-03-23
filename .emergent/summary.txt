@@ -1,125 +1,158 @@
-<analysis>**original_problem_statement**: The user wants to recreate a website from a GitHub repository. The initial URL provided was for a repository named , but it was inaccessible. After investigation, the agent discovered the code was not in the specified GitHub repository but in a local zip file named . The task evolved into recreating the iWhistle B2B Partnership Portal from this zip file and then adding several new features over multiple iterations.
+<analysis>**original_problem_statement**: The user wants to recreate a website from a GitHub repository. The initial URL provided was for a repository named , but it was inaccessible. After investigation, the agent discovered the code was not in the specified GitHub repository but in a local zip file named . The task evolved into recreating the iWhistle B2B Partnership Portal from this zip file and then adding several new features over multiple iterations, including authentication, a partner dashboard, e-signatures, and more. The most recent request is to refactor the entire application's file structure for better organization and scalability.
+
+**PRODUCT REQUIREMENTS**:
+- Recreate the iWhistle B2B Partnership Portal.
+- Add JWT-based authentication for two roles: Partner and Admin.
+- Gate the main content behind a login, with a simple public homepage.
+- Create a protected  dashboard to manage partnership applications.
+- Implement email notifications for new submissions (using Resend).
+- Add CSV export functionality for partnership data on the admin dashboard.
+- Create a  for logged-in partners to view their application status, documents, and submit new applications.
+- Implement an in-app e-signature pad () in the application form.
+- Add a Partner Spotlight section to the homepage.
+- Capture e-signature metadata (IP, timestamp, user agent) for compliance.
+- Generate a downloadable, signed PDF certificate for completed agreements.
+- Add a Program Details tab to the partner dashboard.
+- **Refactor the entire backend and frontend file structure to improve organization and maintainability.**
 
 **User's preferred language**: English
 
 **what currently exists?**
-A complete full-stack application for the iWhistle B2B Partnership Portal has been built.
-- **Frontend**: A React application built with TailwindCSS, featuring a multi-section landing page, an admin dashboard, and a document viewer. It uses  for routing.
-- **Backend**: A FastAPI server connected to MongoDB that handles partnership form submissions and provides data to the admin dashboard.
-- **Key Features**:
-    - A comprehensive partnership application form with client-side validation.
-    - PDF generation and download of the partnership agreement upon form submission.
-    - A fully functional admin dashboard at  to view, search, filter, and manage applications.
-    - An inline document viewer (slide-in panel) for reviewing partnership documents, in addition to download functionality.
+A full-stack application for the iWhistle B2B Partnership Portal has been built. It features a React frontend and a FastAPI backend connected to MongoDB.
+- **Backend**: A single  file contains all logic for API endpoints, database models, and authentication. It handles user registration, JWT-based login for partner and admin roles, partnership form submissions (including e-signature and metadata), and provides protected endpoints for the admin and partner dashboards. Email notifications via Resend are coded but inactive pending an API key.
+- **Frontend**: A React application with JWT-based authentication and role-based routing. It includes a public homepage, a login/register page, a protected multi-tab partner dashboard (), and a protected admin dashboard (). The components and pages are primarily located in the  directory.
 
 **Last working item**:
-- **Last item agent was working**: The agent implemented a document viewer feature. This allows users to click a View button on a document card, which opens a slide-in panel displaying the full, formatted content of the document for review, as an alternative to downloading it.
-- **Status**: COMPLETED
-- **Agent Testing Done**: Y (All 17+ scenarios passed in the final test run).
-- **Which testing method agent to use?**: NA
-- **User Testing Done**: Y (The user did not report any issues and the agent concluded the session after successful implementation and testing, signifying completion).
+- **Last item agent was working**: The agent was in the process of a major file structure refactoring for the backend, as approved by the user. The goal is to break down the monolithic  into a modular structure with separate files for database connections, models, routes, and utilities.
+- **Status**: IN PROGRESS
+- **Agent Testing Done**: N
+- **Which testing method agent to use?**: After completing the refactoring for both backend and frontend, a full regression test is required. The  frontend and backend testing agent should be used to ensure no functionality has been broken.
+- **User Testing Done**: N
 
 **All Pending/In progress Issue list**:
-There are no pending or in-progress issues. All user requests from the session have been addressed and verified.
+- There are no known bugs or issues. The current focus is on the refactoring task.
 
 **In progress Task List**:
-There are no tasks currently in progress.
+- **Task 1: Complete Backend and Frontend File Structure Refactoring (P0)**
+    - **Where to resume**: The backend refactoring has been initiated. The directories , , and the files , ,  have been created.
+      The immediate next steps are:
+      1.  Move all Pydantic models from  to .
+      2.  Move the MongoDB connection logic from  to .
+      3.  Move the email sending functions from  to .
+      4.  Create a  directory and split the API endpoints from  into logical files within it (e.g., , , ).
+      5.  Create a  to initialize the FastAPI app and include the routers from the  directory.
+      6.  Modify the original  to be a thin entrypoint that imports and runs the app from . This avoids needing to change the supervisor configuration.
+      7.  After the backend is done, proceed with the frontend refactoring as planned (moving files from  and  to more organized , ,  etc.).
+    - **What will be achieved with this?**: A more organized, scalable, and maintainable codebase that follows standard conventions for both FastAPI and React projects.
+    - **Status**: IN PROGRESS
+    - **Should Test frontend/backend/both after fix?**: both
+    - **Blocked on something**: No.
 
 **Upcoming and Future Tasks**
-The following are enhancements proposed by the agent in previous sessions that the user has not yet approved. They can be presented as the next logical steps.
 - **Upcoming Tasks**:
-  - **P0: Real-time Chat Widget**: Implement a real-time chat widget for instant support, allowing potential partners to ask questions directly on the site. This was the last suggestion made.
+    - **P1: Activate Email Notifications**: The backend logic is implemented but disabled. The user needs to provide a  to enable notifications for new partnership submissions.
+    - **P2: Multi-language Support**: Implement internationalization (i18n) for the entire application.
+    - **P3: Dark Mode Toggle**: Add a UI toggle to switch the application between light and dark themes.
 - **Future Tasks**:
-  - **P1: E-Signature Integration**: Integrate an e-signature solution (e.g., DocuSign, HelloSign) into the Partnership Agreement form to streamline the finalization process.
-  - **P2: Partner Spotlight Section**: Add a Partner Spotlight section to the homepage to showcase success stories of existing partners, serving as social proof.
+    - **Contact Us Tab**: Add a Contact Us tab to the partner dashboard with an inquiry form that sends a message to the iWhistle team.
 
 **Completed work in this session**
-- **Initial Site Recreation**: Built the entire iWhistle B2B Partnership Portal from a local zip file.
-- **Partnership Form Enhancements**:
-  - Implemented client-side validation with inline error messages in .
-  - Added PDF generation on form submission using  in .
-- **Admin Dashboard Implementation**:
-  - Created a new route  using  in .
-  - Built the  component to display, search, and manage submissions.
-  - Implemented backend endpoints in  to support fetching and updating partnership data.
-- **Document Viewer Feature**:
-  - Created a  UI component for an inline, slide-out document reader.
-  - Updated the  section to include View buttons that trigger the viewer.
+- **Authentication & Gated Content**: Implemented a complete JWT-based authentication system with Partner and Admin roles, securing the application behind a login.
+- **Partner Dashboard**: Created a comprehensive dashboard for partners at  to view application status, documents, and program details.
+- **E-Signature & Compliance**: Integrated an in-app signature pad and backend logic to capture the signature image, timestamp, IP address, and user agent.
+- **PDF Certificate Generation**: Added a feature to generate a downloadable PDF certificate of the signed agreement, including all compliance metadata.
+- **Partner Spotlight**: Added a testimonial section to the public homepage.
+- **Program Details Tab**: Added a new tab to the partner dashboard that reuses existing informational components.
+- **Deployment Readiness**: Analyzed and fixed a  issue that was blocking deployment, confirming the app is ready to be deployed.
+- **Initiated Refactoring**: Started a major file structure refactor for the backend by creating new directories and files.
 
 **Earlier issues found/mentioned but not fixed**
 - None.
 
 **Known issue recurrence from previous fork**
-- None. This is the first summary.
+- None.
 
 **Code Architecture**
 
 
 **Key Technical Concepts**
-- **Frontend**: React, TailwindCSS, Framer Motion, , .
-- **Backend**: FastAPI, Pydantic, Motor (async MongoDB driver).
+- **Frontend**: React, , TailwindCSS, Framer Motion,  (PDF generation),  (E-signature).
+- **Backend**: FastAPI, Pydantic, Motor (async MongoDB driver),  (JWT),  &  (hashing).
 - **Database**: MongoDB.
-- **Architecture**: Full-stack application with a React frontend communicating with a Python (FastAPI) backend.
+- **Architecture**: Monorepo full-stack application with a monolithic backend structure currently being refactored into a modular one.
 
 **key DB schema**
+- **users**: 
 - **partnerships**: 
 
 **changes in tech stack**
-- None. The application was built from the ground up using the standard stack.
+- , , : Added for authentication.
+- : Added for email notifications (currently inactive).
+- : Added for e-signatures.
 
 **All files of reference**
-- : Contains all backend logic for API endpoints.
-- : Main frontend component handling routing and page structure.
-- : The core interactive form with validation and PDF generation logic.
-- : The component for the administrator's view.
-- : The component that provides the inline document reading experience.
-- : The section that integrates the .
+- : The main monolithic backend file that is currently being refactored.
+- : New file for database logic.
+- : New file for Pydantic models.
+- : New file for email utility functions.
+- : The main component for the partner-facing portal.
+- : The main component for the admin-facing dashboard.
+- : The root component handling frontend routing.
 
 **Areas that need refactoring**:
-- The content for the documents is currently hardcoded within the  component. This could be refactored to fetch content from the backend or static JSON/Markdown files to improve maintainability.
+- The entire backend and frontend file structure is the current primary task. The backend is being modularized, and the frontend components (currently mixed in  and ) need to be organized into a standard structure (e.g., , , ).
 
 **key api endpoints**
-- : Submits a new partnership application.
-- : Fetches all partnership applications for the admin dashboard.
-- : Updates the status of a specific partnership application.
+- **Auth**: , , 
+- **Partnerships**: ,  (for the logged-in partner)
+- **Admin**: , , , 
 
 **Critical Info for New Agent**
-- The project's source of truth was a local zip file (), not the GitHub URL initially provided by the user.
-- The application is a B2B Partnership Portal for a fictional company iWhistle.
-- The admin dashboard is located at the  route and is currently not protected by authentication. A link to it exists in the site's footer.
-- The agent has successfully completed several feature iterations, and each has been verified by the testing agent.
+- You must continue the file structure refactoring task. The backend is first. The plan has been approved by the user. Do not change supervisor config; instead, keep  as a thin entry point that runs the app from the new  file.
+- After the backend refactor is complete and tested, you must proceed with the frontend refactoring.
+- The application has an inactive email notification feature. It is fully coded but requires the user to provide a  in the environment variables.
 
 **documents and test reports created in this job**
 - 
 - 
 - 
-- 
 
 **Last 10 User Messages and any pending HUMAN messages**
-The last active user request was to make documents viewable online, not just downloadable. This task has been fully implemented, tested, and completed. There are no pending user requests.
-1.  - Status: **Completed**.
-2.  - Status: **Completed** (This approved the implementation of the form validation, PDF generation, and admin dashboard).
-3.  - Status: **Addressed** (Part of the initial investigation to find the source code).
-4.  - Status: **Addressed** (Initial problem statement).
+10.  - Status: **Completed**. Agent implemented the Program Details tab.
+9.   - Status: **Completed**. This revealed a blocker.
+8.   - Status: **Completed**. This confirmed the blocker was fixed.
+7.   - Status: **In Progress**. User initiated the refactoring task.
+6.   (in response to refactoring plan) - Status: **Addressed**. User approved the agent's plan for a full backend and frontend refactor.
+5.   - Status: **Completed**. User asked to implement P3 tasks.
+4.  - Status: **Addressed**. User chose which P3 task to implement.
+3.  - Status: **Completed**. Agent implemented PDF certificate generation.
+2.  - Status: **Completed**. First health check was run.
+1.  - Status: **Pending**. The user requested this before the refactoring started. After the refactor, the remaining P3 tasks (multi-language, dark mode) should be proposed.
 
 **Project Health Check:**
-- **Broken**: None. The application is fully functional.
-- **Mocked**: Document content is hardcoded in the frontend.
+- **Broken**: None. The application was fully functional before the refactoring began.
+- **Mocked**:
+    - **Email Notifications**: The  integration is in place, but no emails are sent as the  is missing.
+    - **Document Content**: The content for the documents in the partner portal is hardcoded in .
 
 **3rd Party Integrations**
-- None.
+- **Resend**: For email notifications. Implemented but inactive pending API key.
+- **jspdf**: Used on the frontend for PDF generation.
+- **react-signature-canvas**: Used on the frontend for capturing e-signatures.
 
 **Testing status**
-- **Testing agent used after significant changes**: YES (Used after each of the 3 major feature implementations).
+- **Testing agent used after significant changes**: YES. The application has been through multiple rounds of successful testing with the testing agent.
 - **Troubleshoot agent used after agent stuck in loop**: NO.
 - **Test files created**:
+  - 
   - 
   - 
   - 
 - **Known regressions**: None.
 
 **Credentials to test flow:**
-- No credentials are required. The main site is public, and the admin dashboard at  is not currently protected by authentication.
+- **Admin**:  / 
+- **Partner**: A test partner can be registered through the UI or was created via API with credentials  / .
 
 **What agent forgot to execute**
-- The agent successfully completed all explicit user requests and approved suggestions. Nothing was forgotten.</analysis>
+- The agent has not forgotten to execute any tasks. It is currently in the middle of a large, user-approved refactoring task.</analysis>
