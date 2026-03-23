@@ -96,11 +96,13 @@ Recreate the "iWhistle B2B Partnership Portal" and iteratively add features: JWT
 ## Completed Work (Chronological)
 - [Session 1-4] Initial portal recreation from zip, authentication, partner/admin dashboards, e-signatures, PDF generation, partner spotlight, program details tab
 - [Session 5] Full backend + frontend file structure refactoring (2026-03-23)
+- [Session 6] Dark Mode Toggle (global, localStorage-persisted), Contact Us Tab in partner portal (MongoDB-backed), Admin Notification Badge + Partner Inquiries panel (2026-03-23)
 
 ## Prioritized Backlog
 
 ### P1 — High Priority
 - **Activate Email Notifications**: User must provide `RESEND_API_KEY` → add to `backend/.env` as `RESEND_API_KEY=<key>`
+- **Email contact inquiry notifications**: When a partner submits a contact form, notify admin via email (hook already in place, needs Resend key)
 
 ### P2 — Medium Priority
 - **Multi-language Support**: i18n for the full application

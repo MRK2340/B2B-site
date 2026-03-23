@@ -1,7 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ArrowRight, Shield, Brain, Trophy, Users, CheckCircle } from 'lucide-react';
+import { ArrowRight, Shield, Brain, Trophy, Users, CheckCircle, Moon, Sun } from 'lucide-react';
+import { useTheme } from '../context/ThemeContext';
 
 const features = [
   {
@@ -37,23 +38,33 @@ const benefits = [
 ];
 
 export default function HomePage() {
+  const { isDark, toggle: toggleTheme } = useTheme();
+
   return (
-    <div className="min-h-screen bg-white" data-testid="home-page">
+    <div className="min-h-screen bg-white dark:bg-slate-900" data-testid="home-page">
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md shadow-sm">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-800/95 backdrop-blur-md shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-2">
               <div className="w-9 h-9 rounded-lg gradient-primary flex items-center justify-center">
                 <span className="text-white font-bold text-base">i</span>
               </div>
-              <span className="font-bold text-xl text-iwhistle-deep">Whistle</span>
+              <span className="font-bold text-xl text-iwhistle-deep dark:text-white">Whistle</span>
             </div>
             <div className="flex items-center gap-3">
+              <button
+                onClick={toggleTheme}
+                data-testid="theme-toggle-btn"
+                aria-label="Toggle dark mode"
+                className="p-2 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+              >
+                {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+              </button>
               <Link
                 to="/login"
                 data-testid="home-login-btn"
-                className="px-5 py-2 text-sm font-medium text-iwhistle-deep border-2 border-iwhistle-deep rounded-lg hover:bg-iwhistle-deep hover:text-white transition-all duration-200"
+                className="px-5 py-2 text-sm font-medium text-iwhistle-deep dark:text-white border-2 border-iwhistle-deep dark:border-white rounded-lg hover:bg-iwhistle-deep hover:text-white dark:hover:bg-white dark:hover:text-iwhistle-deep transition-all duration-200"
               >
                 Log In
               </Link>
