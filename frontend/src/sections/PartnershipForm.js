@@ -90,7 +90,8 @@ export function PartnershipForm({ onSubmitSuccess }) {
     if (formData.pilotDiscount && (parseFloat(formData.pilotDiscount) < 0 || parseFloat(formData.pilotDiscount) > 100))
       newErrors.pilotDiscount = 'Discount must be between 0 and 100';
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    // Return the computed errors object so callers don't depend on stale state
+    return newErrors;
   };
 
   const handleSave = () => {

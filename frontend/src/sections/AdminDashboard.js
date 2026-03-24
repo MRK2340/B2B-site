@@ -43,11 +43,16 @@ export function AdminDashboard() {
 
   const handleStatusChange = async (id, status) => {
     try {
-      await fetch(`${API_URL}/api/admin/partnerships/${id}/status`, {
+      const res = await fetch(`${API_URL}/api/admin/partnerships/${id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ status }),
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error('Failed to update status:', data.detail || res.statusText);
+        return;
+      }
       fetchData();
       if (selectedPartnership?.id === id) {
         setSelectedPartnership(prev => ({ ...prev, status }));
@@ -60,10 +65,15 @@ export function AdminDashboard() {
   const handleDelete = async (id) => {
     if (!window.confirm('Are you sure you want to delete this partnership application?')) return;
     try {
-      await fetch(`${API_URL}/api/admin/partnerships/${id}`, {
+      const res = await fetch(`${API_URL}/api/admin/partnerships/${id}`, {
         method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` },
       });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        console.error('Failed to delete:', data.detail || res.statusText);
+        return;
+      }
       fetchData();
       if (selectedPartnership?.id === id) setSelectedPartnership(null);
     } catch (err) {

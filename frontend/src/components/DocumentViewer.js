@@ -3,14 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Download, ChevronUp, Printer, BookOpen } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 
-export function DocumentViewer({ document, content, onClose }) {
+export function DocumentViewer({ document: documentSlug, content, onClose }) {
   const [activeSection, setActiveSection] = useState(null);
   const contentRef = useRef(null);
   const [showBackToTop, setShowBackToTop] = useState(false);
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    return () => { document.body.style.overflow = ''; };
+    window.document.body.style.overflow = 'hidden';
+    return () => { window.document.body.style.overflow = ''; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
