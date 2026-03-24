@@ -230,8 +230,9 @@ This agreement is subject to iWhistle's standard Institutional Partnership Agree
   };
 
   const handleSubmit = async () => {
-    if (!validate()) {
-      const firstErrorField = Object.keys(errors)[0] || Object.keys(requiredFields).find(f => !formData[f]?.toString().trim());
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      const firstErrorField = Object.keys(validationErrors)[0];
       if (firstErrorField) document.getElementById(firstErrorField)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
     }

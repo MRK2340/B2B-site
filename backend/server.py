@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Depends, Request, status
+from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -13,9 +13,10 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.colors import HexColor
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, TableStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
+import html as _html
 import resend
 import secrets
 import time
@@ -26,10 +27,17 @@ load_dotenv()
 
 app = FastAPI()
 
+_raw_origins = os.environ.get("ALLOWED_ORIGINS", "")
+_allowed_origins: list[str] = [o.strip() for o in _raw_origins.split(",") if o.strip()] if _raw_origins else ["*"]
+# Per the CORS spec, allow_credentials=True is incompatible with allow_origins=["*"].
+# When an explicit origin list is provided we enable credentials; otherwise we stay
+# with the wildcard (no credentials) so the server starts safely without configuration.
+_allow_credentials = bool(_raw_origins)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
+    allow_origins=_allowed_origins,
+    allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -55,7 +63,6 @@ if RESEND_API_KEY:
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
-security_optional = HTTPBearer(auto_error=False)
 
 # ─── Rate Limiter ─────────────────────────────────────────────────────────────
 
@@ -120,8 +127,17 @@ class PartnershipFormData(BaseModel):
     pilotDiscount: Optional[str] = ""
     signature: Optional[str] = ""
 
+VALID_STATUSES = {"pending", "approved", "rejected"}
+
 class PartnershipStatusUpdate(BaseModel):
     status: str
+
+    @field_validator("status")
+    @classmethod
+    def status_must_be_valid(cls, v: str) -> str:
+        if v not in VALID_STATUSES:
+            raise ValueError(f"status must be one of: {', '.join(sorted(VALID_STATUSES))}")
+        return v
 
 
 # ─── Auth Utilities ───────────────────────────────────────────────────────────
@@ -194,7 +210,11 @@ def send_new_application_email(data: dict):
     if not RESEND_API_KEY:
         return
     try:
-        html = f"""
+        org_name = _html.escape(data.get('partnerOrgName') or 'N/A')
+        contact_name = _html.escape(data.get('contactName') or 'N/A')
+        contact_email = _html.escape(data.get('contactEmail') or 'N/A')
+        created_at = _html.escape(data.get('created_at') or 'N/A')
+        email_html = f"""
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: linear-gradient(135deg, #003D7A, #0080C8); padding: 24px; border-radius: 8px 8px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 22px;">iWhistle</h1>
@@ -203,10 +223,10 @@ def send_new_application_email(data: dict):
           <div style="background: #f9fafb; padding: 24px; border-radius: 0 0 8px 8px; border: 1px solid #e5e7eb;">
             <h2 style="color: #003D7A; font-size: 18px;">Application Details</h2>
             <table style="width: 100%; border-collapse: collapse;">
-              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Organization:</td><td style="padding: 6px 0; font-weight: 600; font-size: 14px;">{data.get('partnerOrgName', 'N/A')}</td></tr>
-              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Contact:</td><td style="padding: 6px 0; font-size: 14px;">{data.get('contactName', 'N/A')}</td></tr>
-              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Email:</td><td style="padding: 6px 0; font-size: 14px;">{data.get('contactEmail', 'N/A')}</td></tr>
-              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Submitted:</td><td style="padding: 6px 0; font-size: 14px;">{data.get('created_at', 'N/A')}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Organization:</td><td style="padding: 6px 0; font-weight: 600; font-size: 14px;">{org_name}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Contact:</td><td style="padding: 6px 0; font-size: 14px;">{contact_name}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Email:</td><td style="padding: 6px 0; font-size: 14px;">{contact_email}</td></tr>
+              <tr><td style="padding: 6px 0; color: #6b7280; font-size: 14px;">Submitted:</td><td style="padding: 6px 0; font-size: 14px;">{created_at}</td></tr>
             </table>
             <div style="margin-top: 24px; padding: 16px; background: white; border-radius: 6px; border-left: 4px solid #0080C8;">
               <p style="margin: 0; color: #374151; font-size: 14px;">Login to the <strong>Admin Dashboard</strong> to review and manage this application.</p>
@@ -218,7 +238,7 @@ def send_new_application_email(data: dict):
             "from": SENDER_EMAIL,
             "to": [ADMIN_NOTIFICATION_EMAIL],
             "subject": f"New Partnership Application: {data.get('partnerOrgName', 'Unknown')}",
-            "html": html,
+            "html": email_html,
         }
         resend.Emails.send(params)
     except Exception as e:
@@ -360,10 +380,20 @@ def admin_stats(user: dict = Depends(require_admin)):
     total_value = 0
     total_officials = 0
     for p in db.partnerships.find({}, {"_id": 0, "perUserRate": 1, "numOfficials": 1, "termStructure": 1, "pilotDiscount": 1}):
-        rate = float(p.get("perUserRate") or 0)
-        officials = int(p.get("numOfficials") or 0)
+        try:
+            rate = float(p.get("perUserRate") or 0)
+        except (ValueError, TypeError):
+            rate = 0.0
+        try:
+            officials = int(p.get("numOfficials") or 0)
+        except (ValueError, TypeError):
+            officials = 0
+        try:
+            discount = float(p.get("pilotDiscount") or 0)
+        except (ValueError, TypeError):
+            discount = 0.0
         months = 12 if p.get("termStructure") == "annual" else 4
-        discount = float(p.get("pilotDiscount") or 0)
+        discount = max(0.0, min(100.0, discount))
         total_value += rate * officials * months * (1 - discount / 100)
         total_officials += officials
 
@@ -427,10 +457,20 @@ def generate_partnership_pdf(partnership_id: str, user: dict = Depends(get_curre
         ("Authorized Users", doc.get("numOfficials", "")),
     ])
 
-    rate = float(doc.get("perUserRate") or 0)
-    officials = int(doc.get("numOfficials") or 0)
+    try:
+        rate = float(doc.get("perUserRate") or 0)
+    except (ValueError, TypeError):
+        rate = 0.0
+    try:
+        officials = int(doc.get("numOfficials") or 0)
+    except (ValueError, TypeError):
+        officials = 0
+    try:
+        discount = float(doc.get("pilotDiscount") or 0)
+    except (ValueError, TypeError):
+        discount = 0.0
     months = 12 if doc.get("termStructure") == "annual" else 4
-    discount = float(doc.get("pilotDiscount") or 0)
+    discount = max(0.0, min(100.0, discount))
     total = rate * officials * months * (1 - discount / 100)
 
     add_section("PRICING", [
