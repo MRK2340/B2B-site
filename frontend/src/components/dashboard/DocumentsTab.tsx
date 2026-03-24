@@ -97,7 +97,7 @@ export function DocumentsTab() {
       <AnimatePresence>
         {viewingDoc && (documentContent as any)[viewingDoc] && (
           <DocumentViewer
-            document={document}
+            document={viewingDoc}
             content={(documentContent as any)[viewingDoc]}
             onClose={() => setViewingDoc(null)}
           />

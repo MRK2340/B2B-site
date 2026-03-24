@@ -1,8 +1,8 @@
-from fastapi import FastAPI, HTTPException, Depends, status
+from fastapi import FastAPI, HTTPException, Depends, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 import os
 import io
@@ -17,6 +17,10 @@ from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch
 import resend
+import secrets
+import time
+from collections import defaultdict
+from threading import Lock
 
 load_dotenv()
 
@@ -39,6 +43,10 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 SENDER_EMAIL = os.environ.get("SENDER_EMAIL")
 ADMIN_NOTIFICATION_EMAIL = os.environ.get("ADMIN_NOTIFICATION_EMAIL")
 
+_missing = [name for name, val in [("MONGO_URL", MONGO_URL), ("DB_NAME", DB_NAME), ("SECRET_KEY", SECRET_KEY)] if not val]
+if _missing:
+    raise RuntimeError(f"Missing required environment variables: {', '.join(_missing)}")
+
 client = MongoClient(MONGO_URL)
 db = client[DB_NAME]
 
@@ -49,17 +57,40 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 security_optional = HTTPBearer(auto_error=False)
 
+# ─── Rate Limiter ─────────────────────────────────────────────────────────────
+
+_rate_limit_store: dict[str, list[float]] = defaultdict(list)
+_rate_limit_lock = Lock()
+
+def check_rate_limit(key: str, max_requests: int = 10, window_seconds: int = 60):
+    """Raise 429 if key has exceeded max_requests within window_seconds."""
+    now = time.time()
+    with _rate_limit_lock:
+        timestamps = _rate_limit_store[key]
+        # Drop timestamps outside the window
+        _rate_limit_store[key] = [t for t in timestamps if now - t < window_seconds]
+        if len(_rate_limit_store[key]) >= max_requests:
+            raise HTTPException(status_code=429, detail="Too many requests, please try again later")
+        _rate_limit_store[key].append(now)
+
 
 # ─── Pydantic Models ──────────────────────────────────────────────────────────
 
 class UserRegister(BaseModel):
     name: str
     organization: str
-    email: str
+    email: EmailStr
     password: str
 
+    @field_validator("password")
+    @classmethod
+    def password_min_length(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError("Password must be at least 6 characters")
+        return v
+
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
 
 class PartnershipFormData(BaseModel):
@@ -129,11 +160,15 @@ def require_admin(user: dict = Depends(get_current_user)):
 def seed_admin():
     existing = db.users.find_one({"email": "admin@i-whistle.com"})
     if not existing:
+        admin_password = os.environ.get("ADMIN_PASSWORD")
+        if not admin_password:
+            admin_password = secrets.token_urlsafe(16)
+            print(f"[WARN] ADMIN_PASSWORD not set. Generated one-time password: {admin_password}")
         db.users.insert_one({
             "name": "Admin",
             "organization": "iWhistle",
             "email": "admin@i-whistle.com",
-            "password_hash": hash_password("admin123"),
+            "password_hash": hash_password(admin_password),
             "role": "admin",
             "created_at": datetime.now(timezone.utc).isoformat(),
         })
@@ -204,7 +239,8 @@ def health_check():
 # ─── Auth Endpoints ───────────────────────────────────────────────────────────
 
 @app.post("/api/auth/register")
-def register(user_data: UserRegister):
+def register(request: Request, user_data: UserRegister):
+    check_rate_limit(f"register:{request.client.host}", max_requests=5, window_seconds=300)
     if db.users.find_one({"email": user_data.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
     db.users.insert_one({
@@ -222,7 +258,8 @@ def register(user_data: UserRegister):
     }
 
 @app.post("/api/auth/login")
-def login(credentials: UserLogin):
+def login(request: Request, credentials: UserLogin):
+    check_rate_limit(f"login:{request.client.host}", max_requests=10, window_seconds=60)
     user = db.users.find_one({"email": credentials.email})
     if not user or not verify_password(credentials.password, user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
@@ -288,21 +325,29 @@ def admin_get_partnerships(
 
 @app.put("/api/admin/partnerships/{partnership_id}/status")
 def update_partnership_status(partnership_id: str, update: PartnershipStatusUpdate, user: dict = Depends(require_admin)):
-    from bson import ObjectId
+    from bson import ObjectId, errors as bson_errors
+    try:
+        oid = ObjectId(partnership_id)
+    except bson_errors.InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid partnership ID")
     result = db.partnerships.update_one(
-        {"_id": ObjectId(partnership_id)},
+        {"_id": oid},
         {"$set": {"status": update.status, "updated_at": datetime.now(timezone.utc).isoformat()}}
     )
     if result.modified_count == 0:
-        return {"status": "error", "message": "Partnership not found"}
+        raise HTTPException(status_code=404, detail="Partnership not found")
     return {"status": "success"}
 
 @app.delete("/api/admin/partnerships/{partnership_id}")
 def delete_partnership(partnership_id: str, user: dict = Depends(require_admin)):
-    from bson import ObjectId
-    result = db.partnerships.delete_one({"_id": ObjectId(partnership_id)})
+    from bson import ObjectId, errors as bson_errors
+    try:
+        oid = ObjectId(partnership_id)
+    except bson_errors.InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid partnership ID")
+    result = db.partnerships.delete_one({"_id": oid})
     if result.deleted_count == 0:
-        return {"status": "error", "message": "Partnership not found"}
+        raise HTTPException(status_code=404, detail="Partnership not found")
     return {"status": "success"}
 
 @app.get("/api/admin/stats")
@@ -333,10 +378,16 @@ def admin_stats(user: dict = Depends(require_admin)):
 
 @app.post("/api/partnerships/{partnership_id}/pdf")
 def generate_partnership_pdf(partnership_id: str, user: dict = Depends(get_current_user)):
-    from bson import ObjectId
-    doc = db.partnerships.find_one({"_id": ObjectId(partnership_id)})
+    from bson import ObjectId, errors as bson_errors
+    try:
+        oid = ObjectId(partnership_id)
+    except bson_errors.InvalidId:
+        raise HTTPException(status_code=400, detail="Invalid partnership ID")
+    doc = db.partnerships.find_one({"_id": oid})
     if not doc:
-        return {"status": "error", "message": "Partnership not found"}
+        raise HTTPException(status_code=404, detail="Partnership not found")
+    if user.get("role") != "admin" and doc.get("submitted_by") != user["email"]:
+        raise HTTPException(status_code=403, detail="Access denied")
 
     buffer = io.BytesIO()
     pdf = SimpleDocTemplate(buffer, pagesize=letter, topMargin=0.5*inch, bottomMargin=0.5*inch)
