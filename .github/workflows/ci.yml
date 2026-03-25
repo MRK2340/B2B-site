@@ -34,6 +34,7 @@ jobs:
           RESEND_API_KEY: ""
           SENDER_EMAIL: ""
           ADMIN_NOTIFICATION_EMAIL: ""
+          ADMIN_PASSWORD: admin123
         run: |
           uvicorn server:app --host 0.0.0.0 --port 8001 &
           echo $! > /tmp/backend.pid
