@@ -24,14 +24,21 @@ export function AdminDashboard() {
     setLoading(true);
     const headers = { Authorization: `Bearer ${token}` };
     try {
-      const [pRes, sRes] = await Promise.all([
-        fetch(`${API_URL}/api/admin/partnerships`, { headers }),
-        fetch(`${API_URL}/api/admin/stats`, { headers }),
-      ]);
-      const pData = await pRes.json();
+      const sRes = await fetch(`${API_URL}/api/admin/stats`, { headers });
       const sData = await sRes.json();
-      setPartnerships(pData.partnerships || []);
       setStats(sData);
+
+      let all = [];
+      let page = 1;
+      let totalPages = 1;
+      do {
+        const pRes = await fetch(`${API_URL}/api/admin/partnerships?page=${page}&per_page=200`, { headers });
+        const pData = await pRes.json();
+        all = all.concat(pData.partnerships || []);
+        totalPages = pData.pages || 1;
+        page++;
+      } while (page <= totalPages);
+      setPartnerships(all);
     } catch (err) {
       console.error('Failed to fetch admin data:', err);
     } finally {
