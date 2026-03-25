@@ -179,7 +179,6 @@ def seed_admin():
         admin_password = os.environ.get("ADMIN_PASSWORD")
         if not admin_password:
             admin_password = secrets.token_urlsafe(16)
-            print("[WARN] ADMIN_PASSWORD not set. A random password was generated. Set the ADMIN_PASSWORD environment variable to control this value.")
         db.users.insert_one({
             "name": "Admin",
             "organization": "iWhistle",
@@ -242,7 +241,7 @@ def send_new_application_email(data: dict):
         }
         resend.Emails.send(params)
     except Exception as e:
-        print(f"Email notification failed: {e}")
+        print(f"Email notification failed: {type(e).__name__}")
 
 
 # ─── Health & Root ────────────────────────────────────────────────────────────
