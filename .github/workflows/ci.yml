@@ -25,6 +25,22 @@ jobs:
       - name: Install backend dependencies
         run: pip install -r backend/requirements.txt
 
+      - name: Start backend server
+        working-directory: backend
+        env:
+          MONGO_URL: mongodb://localhost:27017
+          DB_NAME: iwhistle_ci
+          SECRET_KEY: ci-test-secret-key-not-for-production
+          RESEND_API_KEY: ""
+          SENDER_EMAIL: ""
+          ADMIN_NOTIFICATION_EMAIL: ""
+        run: |
+          uvicorn server:app --host 0.0.0.0 --port 8001 &
+          echo $! > /tmp/backend.pid
+          for i in $(seq 1 15); do
+            curl -sf http://localhost:8001/api/health && break || sleep 1
+          done
+
       - name: Run pytest
         working-directory: backend
         env:
@@ -34,7 +50,7 @@ jobs:
           RESEND_API_KEY: ""
           SENDER_EMAIL: ""
           ADMIN_NOTIFICATION_EMAIL: ""
-          REACT_APP_BACKEND_URL: ""
+          REACT_APP_BACKEND_URL: "http://localhost:8001"
         run: pytest tests/ -v --tb=short
 
   frontend-tests:
