@@ -179,7 +179,7 @@ def seed_admin():
         admin_password = os.environ.get("ADMIN_PASSWORD")
         if not admin_password:
             admin_password = secrets.token_urlsafe(16)
-            print(f"[WARN] ADMIN_PASSWORD not set. Generated one-time password: {admin_password}")
+            print("[WARN] ADMIN_PASSWORD not set. A random password was generated. Set the ADMIN_PASSWORD environment variable to control this value.")
         db.users.insert_one({
             "name": "Admin",
             "organization": "iWhistle",
