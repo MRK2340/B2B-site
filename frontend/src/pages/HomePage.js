@@ -6,42 +6,26 @@ import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
-const features = [
-  {
-    icon: Brain,
-    title: 'AI-Powered Rules Assistance',
-    description: 'Give your officials instant, accurate answers to rules questions with our intelligent AI platform trained on official basketball rulebooks.',
-  },
-  {
-    icon: Trophy,
-    title: 'Video Training Library',
-    description: 'Access a curated library of game film, instructional videos, and scenario-based training modules built specifically for basketball officials.',
-  },
-  {
-    icon: Shield,
-    title: 'Mental Wellness Programming',
-    description: 'Support your officials with evidence-based mental wellness tools designed to help them perform under pressure and handle high-stress situations.',
-  },
-];
-
-const stats = [
-  { value: '500+', label: 'Officials Trained' },
-  { value: '40+', label: 'Partner Organizations' },
-  { value: '95%', label: 'Satisfaction Rate' },
-  { value: '3x', label: 'Performance Improvement' },
-];
-
-const benefits = [
-  'Reduce rules interpretation errors by up to 60%',
-  'Improve officiating consistency across all levels',
-  'Retain and develop officials with modern tools',
-  'Access real-time performance analytics',
-  'Flexible annual or seasonal subscription plans',
-];
-
 export default function HomePage() {
   const { isDark, toggle: toggleTheme } = useTheme();
   const { t } = useTranslation();
+
+  const features = [
+    { icon: Brain, title: t('home.features.aiTitle'), description: t('home.features.aiDesc') },
+    { icon: Trophy, title: t('home.features.videoTitle'), description: t('home.features.videoDesc') },
+    { icon: Shield, title: t('home.features.wellnessTitle'), description: t('home.features.wellnessDesc') },
+  ];
+
+  const stats = [
+    { value: '500+', label: t('home.stats.officials') },
+    { value: '40+', label: t('home.stats.partners') },
+    { value: '95%', label: t('home.stats.satisfaction') },
+    { value: '3x', label: t('home.stats.performance') },
+  ];
+
+  const benefits = [
+    t('home.why.b1'), t('home.why.b2'), t('home.why.b3'), t('home.why.b4'), t('home.why.b5'),
+  ];
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900" data-testid="home-page">
@@ -132,9 +116,7 @@ export default function HomePage() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="text-lg sm:text-xl text-white/90 mb-10 max-w-2xl leading-relaxed"
             >
-              The complete platform for basketball officiating excellence. Partner with iWhistle
-              to give your officials access to AI-powered training, video libraries, and wellness
-              programming — all under one roof.
+              {t('home.heroSubtitle')}
             </motion.p>
 
             <motion.div
@@ -148,7 +130,7 @@ export default function HomePage() {
                 data-testid="hero-get-started-btn"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-iwhistle-deep rounded-lg font-semibold transition-all duration-200 hover:bg-white/90 hover:scale-[1.02] hover:shadow-lg"
               >
-                Become a Partner
+                {t('home.becomePartner')}
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
@@ -156,7 +138,7 @@ export default function HomePage() {
                 data-testid="hero-login-link"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white/10 backdrop-blur-sm text-white border-2 border-white/30 rounded-lg font-semibold transition-all duration-200 hover:bg-white/20"
               >
-                Partner Login
+                {t('home.partnerLogin')}
               </Link>
             </motion.div>
           </div>
