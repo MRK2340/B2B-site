@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { PartnershipForm } from '../sections/PartnershipForm';
 import { PartnershipOverview } from '../sections/PartnershipOverview';
 import { PilotProgram } from '../sections/PilotProgram';
@@ -18,15 +20,6 @@ import { jsPDF } from 'jspdf';
 import { generateSignedPDF } from '../utils/generateSignedPDF';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
-
-const navItems = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'applications', label: 'My Applications', icon: FileCheck2 },
-  { id: 'program', label: 'Program Details', icon: BarChart3 },
-  { id: 'documents', label: 'Documents', icon: BookOpen },
-  { id: 'apply', label: 'Apply Now', icon: PenLine },
-  { id: 'contact', label: 'Contact Us', icon: MessageSquare },
-];
 
 const statusConfig = {
   pending: { label: 'Pending Review', color: 'bg-amber-100 text-amber-800 border-amber-200', icon: Clock },
@@ -480,18 +473,35 @@ function DocumentsTab() {
 
 // ─── Contact Us Tab ───────────────────────────────────────────────────────────
 function ContactTab({ token }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({ category: 'general', subject: '', message: '' });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [myInquiries, setMyInquiries] = useState([]);
+  const [loadingInquiries, setLoadingInquiries] = useState(false);
 
   const categories = [
-    { value: 'general', label: 'General Inquiry' },
-    { value: 'billing', label: 'Billing & Pricing' },
-    { value: 'technical', label: 'Technical Support' },
-    { value: 'partnership', label: 'Partnership Question' },
-    { value: 'other', label: 'Other' },
+    { value: 'general', label: t('portal.contact.catGeneral') },
+    { value: 'billing', label: t('portal.contact.catBilling') },
+    { value: 'technical', label: t('portal.contact.catTechnical') },
+    { value: 'partnership', label: t('portal.contact.catPartnership') },
+    { value: 'other', label: t('portal.contact.catOther') },
   ];
+
+  const fetchMyInquiries = useCallback(async () => {
+    setLoadingInquiries(true);
+    try {
+      const res = await fetch(`${API_URL}/api/contact`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setMyInquiries(data.inquiries || []);
+    } catch {}
+    finally { setLoadingInquiries(false); }
+  }, [token]);
+
+  useEffect(() => { fetchMyInquiries(); }, [fetchMyInquiries]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -506,14 +516,21 @@ function ContactTab({ token }) {
       const data = await res.json();
       if (data.status === 'success') {
         setSubmitted(true);
+        fetchMyInquiries();
       } else {
-        setError('Failed to send message. Please try again.');
+        setError(t('portal.contact.submitError'));
       }
     } catch {
-      setError('Network error. Please try again.');
+      setError(t('portal.contact.networkError'));
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const statusColor = {
+    unread: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    read: 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400',
+    replied: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
   };
 
   if (submitted) {
@@ -523,16 +540,14 @@ function ContactTab({ token }) {
           <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
             <CheckCircle className="w-8 h-8 text-green-500" />
           </div>
-          <h3 className="text-xl font-bold text-iwhistle-deep dark:text-white mb-2">Message Sent!</h3>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">
-            Our team will get back to you within 48 hours.
-          </p>
+          <h3 className="text-xl font-bold text-iwhistle-deep dark:text-white mb-2">{t('portal.contact.success')}</h3>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mb-6">{t('portal.contact.successDesc')}</p>
           <button
             onClick={() => { setSubmitted(false); setForm({ category: 'general', subject: '', message: '' }); }}
             data-testid="contact-send-another-btn"
             className="px-6 py-2.5 gradient-primary text-white rounded-lg font-medium hover:opacity-90 transition-opacity"
           >
-            Send Another Message
+            {t('portal.contact.sendAnother')}
           </button>
         </motion.div>
       </div>
@@ -542,17 +557,15 @@ function ContactTab({ token }) {
   return (
     <div className="p-6 lg:p-8" data-testid="contact-tab">
       <div className="mb-6">
-        <h2 className="text-xl font-bold text-iwhistle-deep dark:text-white">Contact Us</h2>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
-          Have a question or need support? Send us a message and we'll respond within 48 hours.
-        </p>
+        <h2 className="text-xl font-bold text-iwhistle-deep dark:text-white">{t('portal.contact.title')}</h2>
+        <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">{t('portal.contact.subtitle')}</p>
       </div>
       <div className="max-w-2xl">
         <div className="grid sm:grid-cols-3 gap-4 mb-8">
           {[
-            { icon: MessageSquare, title: 'General Support', desc: 'Questions about your account or portal' },
-            { icon: FileText, title: 'Billing & Pricing', desc: 'Rate and contract inquiries' },
-            { icon: Shield, title: 'Technical Help', desc: 'Issues with the platform' },
+            { icon: MessageSquare, title: t('portal.contact.support'), desc: t('portal.contact.supportDesc') },
+            { icon: FileText, title: t('portal.contact.billing'), desc: t('portal.contact.billingDesc') },
+            { icon: Shield, title: t('portal.contact.technical'), desc: t('portal.contact.technicalDesc') },
           ].map((item, i) => (
             <div key={i} className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 p-4 text-center">
               <div className="w-10 h-10 rounded-lg bg-iwhistle-blue/10 flex items-center justify-center mx-auto mb-3">
@@ -563,12 +576,9 @@ function ContactTab({ token }) {
             </div>
           ))}
         </div>
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6 lg:p-8 space-y-5"
-        >
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-800 rounded-2xl border border-gray-100 dark:border-slate-700 shadow-sm p-6 lg:p-8 space-y-5">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Category</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('portal.contact.category')}</label>
             <select
               value={form.category}
               onChange={(e) => setForm({ ...form, category: e.target.value })}
@@ -579,40 +589,73 @@ function ContactTab({ token }) {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Subject</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('portal.contact.subject')}</label>
             <input
               type="text" required value={form.subject}
               onChange={(e) => setForm({ ...form, subject: e.target.value })}
-              placeholder="Brief description of your inquiry"
+              placeholder={t('portal.contact.subjectPlaceholder')}
               data-testid="contact-subject-input"
               className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none text-sm transition-all"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Message</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('portal.contact.message')}</label>
             <textarea
               required value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
-              placeholder="Provide details about your question or issue..."
+              placeholder={t('portal.contact.messagePlaceholder')}
               rows={5}
               data-testid="contact-message-input"
               className="w-full px-4 py-2.5 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-iwhistle-blue focus:ring-2 focus:ring-iwhistle-blue/20 outline-none text-sm transition-all resize-none"
             />
           </div>
           {error && <p className="text-red-500 text-sm" data-testid="contact-error">{error}</p>}
-          <button
-            type="submit" disabled={submitting}
-            data-testid="contact-submit-btn"
+          <button type="submit" disabled={submitting} data-testid="contact-submit-btn"
             className="w-full flex items-center justify-center gap-2 py-3 gradient-primary text-white rounded-lg font-semibold hover:opacity-90 transition-opacity disabled:opacity-60"
           >
             {submitting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
-            {submitting ? 'Sending...' : 'Send Message'}
+            {submitting ? t('portal.contact.sending') : t('portal.contact.send')}
           </button>
         </form>
         <p className="text-xs text-gray-400 dark:text-gray-500 mt-4 text-center">
-          For urgent matters, email us at{' '}
+          {t('portal.contact.urgent')}{' '}
           <a href="mailto:support@i-whistle.com" className="text-iwhistle-blue hover:underline">support@i-whistle.com</a>
         </p>
+
+        {/* My Previous Inquiries */}
+        <div className="mt-8" data-testid="my-inquiries-section">
+          <h3 className="text-sm font-bold text-iwhistle-deep dark:text-white mb-3">{t('portal.contact.myInquiries')}</h3>
+          {loadingInquiries ? (
+            <div className="flex justify-center py-6"><div className="w-6 h-6 border-2 border-iwhistle-blue/20 border-t-iwhistle-blue rounded-full animate-spin" /></div>
+          ) : myInquiries.length === 0 ? (
+            <p className="text-sm text-gray-400 dark:text-gray-500 text-center py-6" data-testid="no-inquiries-msg">{t('portal.contact.noInquiries')}</p>
+          ) : (
+            <div className="space-y-3">
+              {myInquiries.map((inq, idx) => (
+                <div key={inq.id || idx} data-testid={`my-inquiry-${idx}`}
+                  className="bg-white dark:bg-slate-800 rounded-xl border border-gray-100 dark:border-slate-700 p-4">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <p className="text-sm font-semibold text-iwhistle-deep dark:text-white">{inq.subject}</p>
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${statusColor[inq.status] || statusColor.read}`}>
+                      {inq.status}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-2">{inq.message}</p>
+                  {inq.reply_text && (
+                    <div className="mt-3 p-3 bg-iwhistle-blue/5 dark:bg-iwhistle-blue/10 border border-iwhistle-blue/20 rounded-lg">
+                      <p className="text-xs font-semibold text-iwhistle-blue mb-1">{t('portal.contact.adminReply')}</p>
+                      <p className="text-xs text-gray-700 dark:text-gray-300">{inq.reply_text}</p>
+                      {inq.replied_at && (
+                        <p className="text-xs text-gray-400 mt-1">{new Date(inq.replied_at).toLocaleDateString()}</p>
+                      )}
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">{new Date(inq.created_at).toLocaleDateString()}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -626,6 +669,16 @@ export default function PartnerDashboard() {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const { user, token, logout } = useAuth();
   const { isDark, toggle: toggleTheme } = useTheme();
+  const { t } = useTranslation();
+
+  const navItems = React.useMemo(() => [
+    { id: 'overview', label: t('portal.tabs.overview'), icon: LayoutDashboard },
+    { id: 'applications', label: t('portal.tabs.applications'), icon: FileCheck2 },
+    { id: 'program', label: t('portal.tabs.program'), icon: BarChart3 },
+    { id: 'documents', label: t('portal.tabs.documents'), icon: BookOpen },
+    { id: 'apply', label: t('portal.tabs.apply'), icon: PenLine },
+    { id: 'contact', label: t('portal.tabs.contact'), icon: MessageSquare },
+  ], [t]);
 
   const fetchApplications = useCallback(async () => {
     if (!token) return;
@@ -770,6 +823,7 @@ export default function PartnerDashboard() {
             <h1 className="text-lg font-bold text-iwhistle-deep dark:text-white">{navItems.find(n => n.id === activeTab)?.label}</h1>
           </div>
           <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400">
+            <LanguageSwitcher />
             <button
               onClick={toggleTheme}
               data-testid="dashboard-theme-toggle"

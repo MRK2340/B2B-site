@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { UserPlus, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -12,8 +14,8 @@ export default function RegisterPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = async (e) => {
@@ -110,8 +112,8 @@ export default function RegisterPage() {
 
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-8">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-iwhistle-deep dark:text-white mb-2" data-testid="register-title">Create your partner account</h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Get access to the iWhistle Partnership Portal</p>
+              <h1 className="text-2xl font-bold text-iwhistle-deep dark:text-white mb-2" data-testid="register-title">{t('auth.register.title')}</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{t('auth.register.subtitle')}</p>
             </div>
 
             {error && (
@@ -129,7 +131,7 @@ export default function RegisterPage() {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Full Name</label>
+                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('auth.register.fullName')}</label>
                   <input
                     id="name" name="name" type="text"
                     value={form.name} onChange={handleChange} required
@@ -139,7 +141,7 @@ export default function RegisterPage() {
                   />
                 </div>
                 <div>
-                  <label htmlFor="organization" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">Organization</label>
+                  <label htmlFor="organization" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">{t('auth.register.organization')}</label>
                   <input
                     id="organization" name="organization" type="text"
                     value={form.organization} onChange={handleChange} required
@@ -219,7 +221,7 @@ export default function RegisterPage() {
                 ) : (
                   <>
                     <UserPlus className="w-5 h-5" />
-                    Create Account
+                    {t('auth.register.createAccount')}
                   </>
                 )}
               </button>
@@ -227,17 +229,17 @@ export default function RegisterPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Already have an account?{' '}
+                {t('auth.register.hasAccount')}{' '}
                 <Link to="/login" data-testid="go-to-login-link" className="text-iwhistle-blue font-medium hover:text-iwhistle-deep transition-colors">
-                  Sign in
+                  {t('auth.register.signInLink')}
                 </Link>
               </p>
             </div>
-
-            <div className="mt-4 text-center">
+            <div className="mt-4 flex items-center justify-between">
               <Link to="/" data-testid="back-to-home-link" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-                &larr; Back to home
+                &larr; {t('auth.register.backHome')}
               </Link>
+              <LanguageSwitcher />
             </div>
           </div>
         </motion.div>

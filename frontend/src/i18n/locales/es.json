@@ -1,0 +1,208 @@
+{
+  "nav": {
+    "login": "Iniciar Sesión",
+    "getStarted": "Comenzar",
+    "logout": "Cerrar Sesión",
+    "portal": "Portal de Socios",
+    "admin": "Panel de Administración"
+  },
+  "home": {
+    "badge": "PORTAL DE SOCIOS B2B",
+    "heroTitle": "Eleva a tus Árbitros con",
+    "heroSubtitle": "La plataforma completa para la excelencia en el arbitraje de baloncesto. Asóciese con iWhistle para dar a sus árbitros acceso a entrenamiento con IA, videotecas y programas de bienestar — todo en un solo lugar.",
+    "becomePartner": "Convertirse en Socio",
+    "partnerLogin": "Acceso para Socios",
+    "stats": {
+      "officials": "Árbitros Capacitados",
+      "partners": "Organizaciones Socias",
+      "satisfaction": "Tasa de Satisfacción",
+      "performance": "Mejora en Rendimiento"
+    },
+    "features": {
+      "heading": "Todo lo que tus Árbitros Necesitan",
+      "subheading": "iWhistle es la plataforma integral creada específicamente para árbitros de baloncesto y las organizaciones que los apoyan.",
+      "aiTitle": "Asistencia de Reglas con IA",
+      "aiDesc": "Proporciona a tus árbitros respuestas instantáneas y precisas a preguntas sobre las reglas con nuestra plataforma inteligente.",
+      "videoTitle": "Biblioteca de Videos de Entrenamiento",
+      "videoDesc": "Accede a una biblioteca de videos de juego, módulos de entrenamiento y material instruccional para árbitros.",
+      "wellnessTitle": "Programa de Bienestar Mental",
+      "wellnessDesc": "Apoya a tus árbitros con herramientas de bienestar mental diseñadas para rendir bajo presión."
+    },
+    "why": {
+      "heading": "¿Por qué asociarse con iWhistle?",
+      "subheading": "Únase a más de 40 organizaciones que han mejorado sus programas de arbitraje.",
+      "b1": "Reduce los errores de interpretación de reglas hasta en un 60%",
+      "b2": "Mejora la consistencia del arbitraje en todos los niveles",
+      "b3": "Retén y desarrolla árbitros con herramientas modernas",
+      "b4": "Accede a análisis de rendimiento en tiempo real",
+      "b5": "Planes de suscripción anuales o de temporada flexibles",
+      "cta": "Inicia tu Asociación"
+    },
+    "spotlight": {
+      "heading": "Socios Destacados",
+      "subheading": "Descubre lo que nuestros socios dicen sobre iWhistle"
+    },
+    "footer": {
+      "tagline": "Elevando la excelencia en el arbitraje a través de la tecnología.",
+      "rights": "Todos los derechos reservados.",
+      "privacy": "Política de Privacidad",
+      "terms": "Términos de Servicio"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Inicia sesión en tu cuenta",
+      "subtitle": "Ingresa tus credenciales para acceder al portal de socios",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "signIn": "Iniciar Sesión",
+      "noAccount": "¿No tienes una cuenta?",
+      "registerLink": "Regístrate como socio",
+      "backHome": "Volver al inicio"
+    },
+    "register": {
+      "title": "Crea tu cuenta de socio",
+      "subtitle": "Obtén acceso al Portal de Socios de iWhistle",
+      "fullName": "Nombre Completo",
+      "organization": "Organización",
+      "email": "Correo Electrónico",
+      "password": "Contraseña",
+      "confirmPassword": "Confirmar Contraseña",
+      "createAccount": "Crear Cuenta",
+      "hasAccount": "¿Ya tienes una cuenta?",
+      "signInLink": "Iniciar sesión",
+      "backHome": "Volver al inicio",
+      "weak": "Débil",
+      "fair": "Regular",
+      "strong": "Fuerte"
+    }
+  },
+  "portal": {
+    "tabs": {
+      "overview": "Resumen",
+      "applications": "Mis Solicitudes",
+      "program": "Detalles del Programa",
+      "documents": "Documentos",
+      "apply": "Solicitar Ahora",
+      "contact": "Contáctenos"
+    },
+    "overview": {
+      "welcome": "Bienvenido de nuevo",
+      "total": "Total Enviado",
+      "pending": "Pendiente de Revisión",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "quickActions": "Acciones Rápidas",
+      "newApp": "Nueva Solicitud",
+      "newAppDesc": "Envía una solicitud de asociación",
+      "program": "Ver Detalles del Programa",
+      "programDesc": "Precios, estructura piloto y métricas",
+      "documents": "Revisar Documentos",
+      "documentsDesc": "Accede a todos los documentos",
+      "track": "Seguir Solicitudes",
+      "trackDesc": "Ver el estado de tus envíos"
+    },
+    "applications": {
+      "empty": "No hay solicitudes aún",
+      "emptyDesc": "Envía tu primera solicitud de asociación para comenzar.",
+      "startApp": "Iniciar Solicitud",
+      "refresh": "Actualizar",
+      "pending": "Pendiente",
+      "approved": "Aprobado",
+      "rejected": "Rechazado",
+      "downloadPdf": "Descargar PDF del Acuerdo",
+      "submitted": "Enviado",
+      "officials": "Árbitros",
+      "term": "Plazo",
+      "value": "Valor"
+    },
+    "contact": {
+      "title": "Contáctenos",
+      "subtitle": "¿Tienes alguna pregunta? Envíanos un mensaje y responderemos en 48 horas.",
+      "support": "Soporte General",
+      "supportDesc": "Preguntas sobre tu cuenta o portal",
+      "billing": "Facturación y Precios",
+      "billingDesc": "Consultas sobre tarifas y contratos",
+      "technical": "Ayuda Técnica",
+      "technicalDesc": "Problemas con la plataforma",
+      "category": "Categoría",
+      "subject": "Asunto",
+      "subjectPlaceholder": "Breve descripción de tu consulta",
+      "message": "Mensaje",
+      "messagePlaceholder": "Proporciona detalles sobre tu pregunta...",
+      "send": "Enviar Mensaje",
+      "sending": "Enviando...",
+      "catGeneral": "Consulta General",
+      "catBilling": "Facturación y Precios",
+      "catTechnical": "Soporte Técnico",
+      "catPartnership": "Pregunta sobre Asociación",
+      "catOther": "Otro",
+      "success": "¡Mensaje Enviado!",
+      "successDesc": "Nuestro equipo te responderá en 48 horas.",
+      "sendAnother": "Enviar Otro Mensaje",
+      "urgent": "Para asuntos urgentes, escríbenos a",
+      "myInquiries": "Mis Consultas Anteriores",
+      "noInquiries": "Sin consultas anteriores",
+      "adminReply": "Respuesta de iWhistle",
+      "networkError": "Error de red. Inténtalo de nuevo.",
+      "submitError": "Error al enviar el mensaje. Inténtalo de nuevo."
+    }
+  },
+  "admin": {
+    "title": "Panel de Administración",
+    "backToPortal": "Volver al Portal",
+    "exportCsv": "Exportar CSV",
+    "refresh": "Actualizar",
+    "logout": "Cerrar Sesión",
+    "totalApps": "Total de Solicitudes",
+    "pendingReview": "Pendiente de Revisión",
+    "approved": "Aprobadas",
+    "totalValue": "Valor Total",
+    "searchPlaceholder": "Buscar por organización, contacto o correo...",
+    "allStatus": "Todos los estados",
+    "organization": "Organización",
+    "contact": "Contacto",
+    "officials": "Árbitros",
+    "status": "Estado",
+    "submitted": "Enviado",
+    "actions": "Acciones",
+    "noApps": "No se encontraron solicitudes",
+    "noAppsDesc": "Las solicitudes aparecerán aquí cuando se envíen",
+    "noAppsFiltered": "Intenta ajustar la búsqueda o los filtros",
+    "showing": "Mostrando",
+    "of": "de",
+    "applications": "solicitudes",
+    "pending": "Pendiente",
+    "inquiries": {
+      "title": "Consultas de Socios",
+      "unread": "sin leer",
+      "noInquiries": "Sin consultas aún",
+      "markRead": "Marcar leído",
+      "reply": "Responder",
+      "replyPlaceholder": "Escribe tu respuesta a esta consulta...",
+      "sendReply": "Enviar Respuesta",
+      "sending": "Enviando...",
+      "repliedOn": "Respondido el",
+      "yourReply": "Tu respuesta"
+    },
+    "users": {
+      "title": "Cuentas de Socios",
+      "noUsers": "Sin cuentas de socios aún",
+      "name": "Nombre",
+      "email": "Correo",
+      "organization": "Organización",
+      "joined": "Registrado",
+      "apps": "Solicitudes"
+    }
+  },
+  "common": {
+    "loading": "Cargando...",
+    "view": "Ver",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "cancel": "Cancelar",
+    "pending": "Pendiente",
+    "approved": "Aprobado",
+    "rejected": "Rechazado"
+  }
+}

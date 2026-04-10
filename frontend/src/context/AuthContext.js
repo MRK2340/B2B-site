@@ -38,6 +38,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('iwhistle_token');
     setToken(null);
     setUser(null);
+    window.location.replace('/');
   };
 
   return (

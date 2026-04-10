@@ -4,10 +4,12 @@ import { Link } from 'react-router-dom';
 import {
   ArrowLeft, Users, DollarSign, Clock, CheckCircle, XCircle,
   Trash2, Eye, RefreshCw, Search, Filter, ChevronDown, Download,
-  LogOut, Shield, Monitor, MapPin, Bell, MessageSquare, Moon, Sun
+  LogOut, Shield, Monitor, MapPin, Bell, MessageSquare, Moon, Sun, UserCheck, Send
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 import { generateSignedPDF } from '../utils/generateSignedPDF';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
@@ -231,6 +233,13 @@ export default function AdminDashboard() {
   const [inquiriesLoading, setInquiriesLoading] = useState(false);
   const { token, logout } = useAuth();
   const { isDark, toggle: toggleTheme } = useTheme();
+  const { t } = useTranslation();
+  const [replyTexts, setReplyTexts] = useState({});
+  const [replyingTo, setReplyingTo] = useState(null);
+  const [replySending, setReplySending] = useState(false);
+  const [partnerUsers, setPartnerUsers] = useState([]);
+  const [showUsers, setShowUsers] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -277,6 +286,43 @@ export default function AdminDashboard() {
       console.error('Failed to mark inquiry read:', err);
     }
   };
+
+  const sendReply = async (id) => {
+    const replyText = replyTexts[id]?.trim();
+    if (!replyText) return;
+    setReplySending(true);
+    try {
+      await fetch(`${API_URL}/api/admin/contact/${id}/reply`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ reply_text: replyText }),
+      });
+      setInquiries((prev) => prev.map((i) =>
+        i.id === id ? { ...i, status: 'replied', reply_text: replyText, replied_at: new Date().toISOString() } : i
+      ));
+      setReplyingTo(null);
+      setReplyTexts((prev) => ({ ...prev, [id]: '' }));
+    } catch (err) {
+      console.error('Failed to send reply:', err);
+    } finally {
+      setReplySending(false);
+    }
+  };
+
+  const fetchPartnerUsers = useCallback(async () => {
+    setUsersLoading(true);
+    try {
+      const res = await fetch(`${API_URL}/api/admin/users`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = await res.json();
+      setPartnerUsers(data.users || []);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+    } finally {
+      setUsersLoading(false);
+    }
+  }, [token]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
@@ -403,6 +449,7 @@ export default function AdminDashboard() {
               >
                 {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               </button>
+              <LanguageSwitcher />
               <button onClick={fetchData} disabled={loading} data-testid="refresh-btn"
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50">
                 <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
@@ -579,7 +626,7 @@ export default function AdminDashboard() {
                   ) : inquiries.length === 0 ? (
                     <div className="text-center py-10" data-testid="no-inquiries">
                       <MessageSquare className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-2" />
-                      <p className="text-gray-500 dark:text-gray-400 text-sm">No inquiries yet</p>
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">{t('admin.inquiries.noInquiries')}</p>
                     </div>
                   ) : (
                     <div className="divide-y divide-gray-100 dark:divide-slate-700">
@@ -587,34 +634,163 @@ export default function AdminDashboard() {
                         <div
                           key={inq.id || idx}
                           data-testid={`inquiry-row-${idx}`}
-                          className={`p-4 flex items-start gap-4 transition-colors ${
+                          className={`p-4 transition-colors ${
                             inq.status === 'unread'
                               ? 'bg-amber-50/50 dark:bg-amber-900/10'
                               : 'hover:bg-gray-50 dark:hover:bg-slate-700/30'
                           }`}
                         >
-                          <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${inq.status === 'unread' ? 'bg-amber-400' : 'bg-gray-300 dark:bg-gray-600'}`} />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-sm font-semibold text-iwhistle-deep dark:text-white">{inq.subject}</span>
-                              <span className="text-xs px-2 py-0.5 rounded-full bg-iwhistle-blue/10 text-iwhistle-blue capitalize">{inq.category}</span>
+                          <div className="flex items-start gap-4">
+                            <div className={`w-2 h-2 rounded-full mt-2 flex-shrink-0 ${inq.status === 'unread' ? 'bg-amber-400' : inq.status === 'replied' ? 'bg-green-400' : 'bg-gray-300 dark:bg-gray-600'}`} />
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="text-sm font-semibold text-iwhistle-deep dark:text-white">{inq.subject}</span>
+                                <span className="text-xs px-2 py-0.5 rounded-full bg-iwhistle-blue/10 text-iwhistle-blue capitalize">{inq.category}</span>
+                                {inq.status === 'replied' && (
+                                  <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400">replied</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">{inq.message}</p>
+                              <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+                                From <span className="font-medium">{inq.user_name}</span> ({inq.organization}) · {inq.created_at ? new Date(inq.created_at).toLocaleDateString() : ''}
+                              </p>
+                              {inq.reply_text && (
+                                <div className="mt-2 p-2 bg-iwhistle-blue/5 dark:bg-iwhistle-blue/10 border border-iwhistle-blue/20 rounded-lg">
+                                  <p className="text-xs font-medium text-iwhistle-blue">{t('admin.inquiries.yourReply')}</p>
+                                  <p className="text-xs text-gray-700 dark:text-gray-300 mt-0.5">{inq.reply_text}</p>
+                                </div>
+                              )}
+                              {replyingTo === inq.id && (
+                                <div className="mt-3 space-y-2" data-testid={`reply-form-${idx}`}>
+                                  <textarea
+                                    value={replyTexts[inq.id] || ''}
+                                    onChange={(e) => setReplyTexts((prev) => ({ ...prev, [inq.id]: e.target.value }))}
+                                    placeholder={t('admin.inquiries.replyPlaceholder')}
+                                    rows={3}
+                                    data-testid={`reply-textarea-${idx}`}
+                                    className="w-full px-3 py-2 rounded-lg border border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-gray-100 text-sm focus:border-iwhistle-blue focus:ring-1 focus:ring-iwhistle-blue/20 outline-none resize-none"
+                                  />
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => sendReply(inq.id)}
+                                      disabled={replySending || !(replyTexts[inq.id]?.trim())}
+                                      data-testid={`send-reply-btn-${idx}`}
+                                      className="flex items-center gap-1.5 px-3 py-1.5 gradient-primary text-white rounded-lg text-xs font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
+                                    >
+                                      <Send className="w-3.5 h-3.5" />
+                                      {replySending ? t('admin.inquiries.sending') : t('admin.inquiries.sendReply')}
+                                    </button>
+                                    <button
+                                      onClick={() => setReplyingTo(null)}
+                                      className="px-3 py-1.5 text-gray-500 dark:text-gray-400 rounded-lg text-xs hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
+                                    >
+                                      Cancel
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5 truncate">{inq.message}</p>
-                            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
-                              From <span className="font-medium">{inq.user_name}</span> ({inq.organization}) · {inq.created_at ? new Date(inq.created_at).toLocaleDateString() : ''}
-                            </p>
+                            <div className="flex items-center gap-2 flex-shrink-0">
+                              {inq.status === 'unread' && (
+                                <button onClick={() => markInquiryRead(inq.id)} data-testid={`mark-read-btn-${idx}`}
+                                  className="text-xs text-iwhistle-blue hover:underline font-medium"
+                                >
+                                  {t('admin.inquiries.markRead')}
+                                </button>
+                              )}
+                              {!inq.reply_text && (
+                                <button
+                                  onClick={() => setReplyingTo(replyingTo === inq.id ? null : inq.id)}
+                                  data-testid={`reply-btn-${idx}`}
+                                  className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400 hover:text-iwhistle-blue transition-colors font-medium"
+                                >
+                                  <Send className="w-3.5 h-3.5" />
+                                  {t('admin.inquiries.reply')}
+                                </button>
+                              )}
+                            </div>
                           </div>
-                          {inq.status === 'unread' && (
-                            <button
-                              onClick={() => markInquiryRead(inq.id)}
-                              data-testid={`mark-read-btn-${idx}`}
-                              className="flex-shrink-0 text-xs text-iwhistle-blue hover:underline font-medium"
-                            >
-                              Mark read
-                            </button>
-                          )}
                         </div>
                       ))}
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Partner Users Section */}
+        <div className="mt-4">
+          <button
+            onClick={() => { setShowUsers(!showUsers); if (!showUsers && partnerUsers.length === 0) fetchPartnerUsers(); }}
+            data-testid="toggle-users-btn"
+            className="flex items-center gap-3 w-full bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-4 hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors"
+          >
+            <UserCheck className="w-5 h-5 text-iwhistle-blue" />
+            <span className="font-semibold text-iwhistle-deep dark:text-white text-sm">{t('admin.users.title')}</span>
+            {partnerUsers.length > 0 && (
+              <span className="bg-iwhistle-blue/10 text-iwhistle-blue text-xs font-medium px-2 py-0.5 rounded-full">
+                {partnerUsers.length}
+              </span>
+            )}
+            <ChevronDown className={`w-4 h-4 text-gray-400 ml-auto transition-transform duration-200 ${showUsers ? 'rotate-180' : ''}`} />
+          </button>
+          <AnimatePresence>
+            {showUsers && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="mt-2 bg-white dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700 overflow-hidden">
+                  {usersLoading ? (
+                    <div className="flex items-center justify-center py-10" data-testid="users-loading">
+                      <div className="w-6 h-6 border-2 border-iwhistle-blue/20 border-t-iwhistle-blue rounded-full animate-spin" />
+                    </div>
+                  ) : partnerUsers.length === 0 ? (
+                    <div className="text-center py-10" data-testid="no-users">
+                      <Users className="w-10 h-10 text-gray-200 dark:text-gray-600 mx-auto mb-2" />
+                      <p className="text-gray-500 dark:text-gray-400 text-sm">{t('admin.users.noUsers')}</p>
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full" data-testid="users-table">
+                        <thead>
+                          <tr className="bg-gray-50 dark:bg-slate-700/50 border-b border-gray-200 dark:border-slate-700">
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{t('admin.users.name')}</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{t('admin.users.email')}</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">{t('admin.users.organization')}</th>
+                            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">{t('admin.users.joined')}</th>
+                            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase">{t('admin.users.apps')}</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+                          {partnerUsers.map((u, idx) => (
+                            <tr key={idx} data-testid={`user-row-${idx}`} className="hover:bg-gray-50/50 dark:hover:bg-slate-700/30 transition-colors">
+                              <td className="px-4 py-3">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-7 h-7 rounded-full gradient-primary flex items-center justify-center flex-shrink-0">
+                                    <span className="text-white text-xs font-bold">{(u.name || 'U')[0].toUpperCase()}</span>
+                                  </div>
+                                  <span className="text-sm font-medium text-iwhistle-deep dark:text-white">{u.name}</span>
+                                </div>
+                              </td>
+                              <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300">{u.email}</td>
+                              <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">{u.organization}</td>
+                              <td className="px-4 py-3 text-sm text-gray-400 dark:text-gray-500 hidden md:table-cell">
+                                {u.created_at ? new Date(u.created_at).toLocaleDateString() : '-'}
+                              </td>
+                              <td className="px-4 py-3 text-center">
+                                <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-iwhistle-blue/10 text-iwhistle-blue text-xs font-bold">
+                                  {u.app_count}
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
                 </div>

@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { LogIn, Eye, EyeOff, AlertCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 const API_URL = process.env.REACT_APP_BACKEND_URL;
 
@@ -13,6 +15,7 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -91,8 +94,8 @@ export default function LoginPage() {
 
           <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-100 dark:border-slate-700 p-8">
             <div className="mb-8">
-              <h1 className="text-2xl font-bold text-iwhistle-deep dark:text-white mb-2" data-testid="login-title">Sign in to your account</h1>
-              <p className="text-gray-500 dark:text-gray-400 text-sm">Enter your credentials to access the partner portal</p>
+              <h1 className="text-2xl font-bold text-iwhistle-deep dark:text-white mb-2" data-testid="login-title">{t('auth.login.title')}</h1>
+              <p className="text-gray-500 dark:text-gray-400 text-sm">{t('auth.login.subtitle')}</p>
             </div>
 
             {error && (
@@ -110,7 +113,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Email Address
+                  {t('auth.login.email')}
                 </label>
                 <input
                   id="email"
@@ -126,7 +129,7 @@ export default function LoginPage() {
 
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
-                  Password
+                  {t('auth.login.password')}
                 </label>
                 <div className="relative">
                   <input
@@ -161,7 +164,7 @@ export default function LoginPage() {
                 ) : (
                   <>
                     <LogIn className="w-5 h-5" />
-                    Sign In
+                    {t('auth.login.signIn')}
                   </>
                 )}
               </button>
@@ -169,17 +172,17 @@ export default function LoginPage() {
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Don't have an account?{' '}
+                {t('auth.login.noAccount')}{' '}
                 <Link to="/register" data-testid="go-to-register-link" className="text-iwhistle-blue font-medium hover:text-iwhistle-deep transition-colors">
-                  Register as a partner
+                  {t('auth.login.registerLink')}
                 </Link>
               </p>
             </div>
-
-            <div className="mt-4 text-center">
+            <div className="mt-4 flex items-center justify-between">
               <Link to="/" data-testid="back-to-home-link" className="text-sm text-gray-400 hover:text-gray-600 transition-colors">
-                &larr; Back to home
+                &larr; {t('auth.login.backHome')}
               </Link>
+              <LanguageSwitcher />
             </div>
           </div>
         </motion.div>

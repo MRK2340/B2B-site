@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Shield, Brain, Trophy, Users, CheckCircle, Moon, Sun } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { useTranslation } from 'react-i18next';
+import { LanguageSwitcher } from '../components/LanguageSwitcher';
 
 const features = [
   {
@@ -39,6 +41,7 @@ const benefits = [
 
 export default function HomePage() {
   const { isDark, toggle: toggleTheme } = useTheme();
+  const { t } = useTranslation();
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900" data-testid="home-page">
@@ -53,6 +56,7 @@ export default function HomePage() {
               <span className="font-bold text-xl text-iwhistle-deep dark:text-white">Whistle</span>
             </div>
             <div className="flex items-center gap-3">
+              <LanguageSwitcher />
               <button
                 onClick={toggleTheme}
                 data-testid="theme-toggle-btn"
@@ -66,14 +70,14 @@ export default function HomePage() {
                 data-testid="home-login-btn"
                 className="px-5 py-2 text-sm font-medium text-iwhistle-deep dark:text-white border-2 border-iwhistle-deep dark:border-white rounded-lg hover:bg-iwhistle-deep hover:text-white dark:hover:bg-white dark:hover:text-iwhistle-deep transition-all duration-200"
               >
-                Log In
+                {t('nav.login')}
               </Link>
               <Link
                 to="/register"
                 data-testid="home-register-btn"
                 className="px-5 py-2 text-sm font-medium bg-iwhistle-blue text-white rounded-lg hover:bg-iwhistle-deep transition-all duration-200"
               >
-                Get Started
+                {t('nav.getStarted')}
               </Link>
             </div>
           </div>
@@ -107,7 +111,7 @@ export default function HomePage() {
               transition={{ duration: 0.5 }}
             >
               <span className="inline-block px-4 py-1.5 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium text-white mb-6">
-                B2B PARTNERSHIP PORTAL
+                {t('home.badge')}
               </span>
             </motion.div>
 
@@ -118,7 +122,7 @@ export default function HomePage() {
               className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-tight mb-6"
               data-testid="home-hero-title"
             >
-              Elevate Your Officials with{' '}
+              {t('home.heroTitle')}{' '}
               <span className="text-iwhistle-orange">iWhistle</span>
             </motion.h1>
 

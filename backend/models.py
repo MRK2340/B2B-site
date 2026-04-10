@@ -50,3 +50,7 @@ class ContactInquiry(BaseModel):
     category: Optional[str] = "general"
     subject: str
     message: str
+
+
+class ContactReply(BaseModel):
+    reply_text: str

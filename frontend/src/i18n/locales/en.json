@@ -1,0 +1,208 @@
+{
+  "nav": {
+    "login": "Log In",
+    "getStarted": "Get Started",
+    "logout": "Logout",
+    "portal": "Partner Portal",
+    "admin": "Admin Dashboard"
+  },
+  "home": {
+    "badge": "B2B PARTNERSHIP PORTAL",
+    "heroTitle": "Elevate Your Officials with",
+    "heroSubtitle": "The complete platform for basketball officiating excellence. Partner with iWhistle to give your officials access to AI-powered training, video libraries, and wellness programming — all under one roof.",
+    "becomePartner": "Become a Partner",
+    "partnerLogin": "Partner Login",
+    "stats": {
+      "officials": "Officials Trained",
+      "partners": "Partner Organizations",
+      "satisfaction": "Satisfaction Rate",
+      "performance": "Performance Improvement"
+    },
+    "features": {
+      "heading": "Everything Your Officials Need",
+      "subheading": "iWhistle is the all-in-one platform built specifically for basketball officials and the organizations that support them.",
+      "aiTitle": "AI-Powered Rules Assistance",
+      "aiDesc": "Give your officials instant, accurate answers to rules questions with our intelligent AI platform trained on official basketball rulebooks.",
+      "videoTitle": "Video Training Library",
+      "videoDesc": "Access a curated library of game film, instructional videos, and scenario-based training modules built specifically for basketball officials.",
+      "wellnessTitle": "Mental Wellness Programming",
+      "wellnessDesc": "Support your officials with evidence-based mental wellness tools designed to help them perform under pressure and handle high-stress situations."
+    },
+    "why": {
+      "heading": "Why Partner with iWhistle?",
+      "subheading": "Join 40+ organizations that have elevated their officiating programs with iWhistle's comprehensive platform.",
+      "b1": "Reduce rules interpretation errors by up to 60%",
+      "b2": "Improve officiating consistency across all levels",
+      "b3": "Retain and develop officials with modern tools",
+      "b4": "Access real-time performance analytics",
+      "b5": "Flexible annual or seasonal subscription plans",
+      "cta": "Start Your Partnership"
+    },
+    "spotlight": {
+      "heading": "Partner Spotlight",
+      "subheading": "See what our partners are saying about iWhistle"
+    },
+    "footer": {
+      "tagline": "Elevating officiating excellence through technology.",
+      "rights": "All rights reserved.",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "subtitle": "Enter your credentials to access the partner portal",
+      "email": "Email Address",
+      "password": "Password",
+      "signIn": "Sign In",
+      "noAccount": "Don't have an account?",
+      "registerLink": "Register as a partner",
+      "backHome": "Back to home"
+    },
+    "register": {
+      "title": "Create your partner account",
+      "subtitle": "Get access to the iWhistle Partnership Portal",
+      "fullName": "Full Name",
+      "organization": "Organization",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "createAccount": "Create Account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "backHome": "Back to home",
+      "weak": "Weak",
+      "fair": "Fair",
+      "strong": "Strong"
+    }
+  },
+  "portal": {
+    "tabs": {
+      "overview": "Overview",
+      "applications": "My Applications",
+      "program": "Program Details",
+      "documents": "Documents",
+      "apply": "Apply Now",
+      "contact": "Contact Us"
+    },
+    "overview": {
+      "welcome": "Welcome back",
+      "total": "Total Submitted",
+      "pending": "Pending Review",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "quickActions": "Quick Actions",
+      "newApp": "Start New Application",
+      "newAppDesc": "Submit a partnership application",
+      "program": "View Program Details",
+      "programDesc": "Pricing, pilot structure & metrics",
+      "documents": "Review Documents",
+      "documentsDesc": "Access all partnership documents",
+      "track": "Track Applications",
+      "trackDesc": "View status of your submissions"
+    },
+    "applications": {
+      "empty": "No applications yet",
+      "emptyDesc": "Submit your first partnership application to get started.",
+      "startApp": "Start Application",
+      "refresh": "Refresh",
+      "pending": "Pending",
+      "approved": "Approved",
+      "rejected": "Rejected",
+      "downloadPdf": "Download Agreement PDF",
+      "submitted": "Submitted",
+      "officials": "Officials",
+      "term": "Term",
+      "value": "Value"
+    },
+    "contact": {
+      "title": "Contact Us",
+      "subtitle": "Have a question or need support? Send us a message and we'll respond within 48 hours.",
+      "support": "General Support",
+      "supportDesc": "Questions about your account or portal",
+      "billing": "Billing & Pricing",
+      "billingDesc": "Rate and contract inquiries",
+      "technical": "Technical Help",
+      "technicalDesc": "Issues with the platform",
+      "category": "Category",
+      "subject": "Subject",
+      "subjectPlaceholder": "Brief description of your inquiry",
+      "message": "Message",
+      "messagePlaceholder": "Provide details about your question or issue...",
+      "send": "Send Message",
+      "sending": "Sending...",
+      "catGeneral": "General Inquiry",
+      "catBilling": "Billing & Pricing",
+      "catTechnical": "Technical Support",
+      "catPartnership": "Partnership Question",
+      "catOther": "Other",
+      "success": "Message Sent!",
+      "successDesc": "Our team will get back to you within 48 hours.",
+      "sendAnother": "Send Another Message",
+      "urgent": "For urgent matters, email us at",
+      "myInquiries": "My Previous Inquiries",
+      "noInquiries": "No previous inquiries",
+      "adminReply": "Reply from iWhistle",
+      "networkError": "Network error. Please try again.",
+      "submitError": "Failed to send message. Please try again."
+    }
+  },
+  "admin": {
+    "title": "Admin Dashboard",
+    "backToPortal": "Back to Portal",
+    "exportCsv": "Export CSV",
+    "refresh": "Refresh",
+    "logout": "Logout",
+    "totalApps": "Total Applications",
+    "pendingReview": "Pending Review",
+    "approved": "Approved",
+    "totalValue": "Total Value",
+    "searchPlaceholder": "Search by organization, contact name, or email...",
+    "allStatus": "All Status",
+    "organization": "Organization",
+    "contact": "Contact",
+    "officials": "Officials",
+    "status": "Status",
+    "submitted": "Submitted",
+    "actions": "Actions",
+    "noApps": "No partnership applications found",
+    "noAppsDesc": "Applications will appear here when submitted",
+    "noAppsFiltered": "Try adjusting your search or filters",
+    "showing": "Showing",
+    "of": "of",
+    "applications": "applications",
+    "pending": "Pending",
+    "inquiries": {
+      "title": "Partner Inquiries",
+      "unread": "unread",
+      "noInquiries": "No inquiries yet",
+      "markRead": "Mark read",
+      "reply": "Reply",
+      "replyPlaceholder": "Type your reply to this inquiry...",
+      "sendReply": "Send Reply",
+      "sending": "Sending...",
+      "repliedOn": "Replied on",
+      "yourReply": "Your reply"
+    },
+    "users": {
+      "title": "Partner Accounts",
+      "noUsers": "No partner accounts yet",
+      "name": "Name",
+      "email": "Email",
+      "organization": "Organization",
+      "joined": "Joined",
+      "apps": "Apps"
+    }
+  },
+  "common": {
+    "loading": "Loading...",
+    "view": "View",
+    "delete": "Delete",
+    "close": "Close",
+    "cancel": "Cancel",
+    "pending": "Pending",
+    "approved": "Approved",
+    "rejected": "Rejected"
+  }
+}

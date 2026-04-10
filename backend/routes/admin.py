@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from datetime import datetime, timezone
 from bson import ObjectId
-from models import PartnershipStatusUpdate
+from models import PartnershipStatusUpdate, ContactReply
 from database import db
 from utils.auth import require_admin
 
@@ -87,3 +87,33 @@ def mark_contact_read(inquiry_id: str, user: dict = Depends(require_admin)):
         {"$set": {"status": "read"}},
     )
     return {"status": "success"}
+
+
+@router.post("/contact/{inquiry_id}/reply")
+def reply_to_contact(inquiry_id: str, reply: ContactReply, user: dict = Depends(require_admin)):
+    db.contact_inquiries.update_one(
+        {"_id": ObjectId(inquiry_id)},
+        {"$set": {
+            "status": "replied",
+            "reply_text": reply.reply_text,
+            "replied_at": datetime.now(timezone.utc).isoformat(),
+            "replied_by": user["email"],
+        }},
+    )
+    return {"status": "success"}
+
+
+@router.get("/users")
+def admin_get_users(user: dict = Depends(require_admin)):
+    users = []
+    for doc in db.users.find({"role": "partner"}).sort("created_at", -1):
+        email = doc.get("email", "")
+        app_count = db.partnerships.count_documents({"submitted_by": email})
+        users.append({
+            "name": doc.get("name", ""),
+            "email": email,
+            "organization": doc.get("organization", ""),
+            "created_at": doc.get("created_at", ""),
+            "app_count": app_count,
+        })
+    return {"users": users}
